@@ -19,9 +19,9 @@ export default function SignInPage() {
             <Box sx={{ maxWidth: 400, width: '100%', padding: 24, borderRadius: 8 }}>
                 {/* <Title order={1}>IR Website (Name tbd)</Title> */}
                 {/* Header */}
-                <Text align="center" size="xl" weight={700} style={{ color: theme.accentColor, marginBottom: 8 }}>
-                    Sign in
-                </Text>
+                <Title order={1} align="center" weight={700} style={{ color: theme.accentColor, marginBottom: 8 }}>
+                    Log in
+                </Title>
                 <Text size="sm" style={{ color: theme.primaryTextColor, marginBottom: 24 }}>
                     Log in by entering your email address and password.
                 </Text>
