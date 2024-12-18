@@ -46,7 +46,7 @@ export default function SignInPage() {
 
                 {/* Footer */}
                 <Text align="center" size="sm" style={{ color: theme.primaryTextColor, marginTop: 16 }}>
-                    <Anchor href="/signup" style={{ color: theme.accentColor }}>
+                    <Anchor href="/login" style={{ color: theme.accentColor }}>
                         Return to login here
                     </Anchor>
                 </Text>
