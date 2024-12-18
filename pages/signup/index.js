@@ -16,15 +16,31 @@ export default function SignInPage() {
 
     return (
         <Center style={{ minHeight: '100vh', backgroundColor: theme.background }}>
-            <Box sx={{ maxWidth: 400, width: '100%', padding: 24, borderRadius: 8 }}>
+            <Box sx={{ minWidth: 400, width: '100%', padding: 24, borderRadius: 8 }}>
                 {/* <Title order={1}>IR Website (Name tbd)</Title> */}
                 {/* Header */}
                 <Title order={1} align="left" weight={700} style={{ color: theme.accentColor, marginBottom: 8 }}>
-                    Log in
+                    Create Your Account
                 </Title>
-                <Text size="sm" style={{ color: theme.primaryTextColor, marginBottom: 24 }}>
-                    Log in by entering your email address and password.
-                </Text>
+                <br />
+
+                {/* Google Sign In */}
+                <Button
+                    fullWidth
+                    variant="outline"
+                    leftIcon={<IconBrandGoogle size={18} />}
+                    color="gray"
+                    mt="md"
+                    radius="md"
+                    style={{ borderColor: theme.accentColor, color: theme.accentColor, minWidth: '300px', width: "25vw" }}
+                >
+                    Sign in with Google
+                </Button>
+
+                {/* Divider */}
+                <Stack position="apart" align='center' mt="md">
+                    <Divider size="sm" label="Or" labelPosition="center" style={{ width: '45%' }} />
+                </Stack>
 
                 {/* Email Input */}
                 <Stack spacing="sm">
@@ -54,46 +70,18 @@ export default function SignInPage() {
                     />
                 </Stack>
 
-                {/* Forgot Password */}
-                <Anchor href="#" size="sm" style={{ color: theme.primaryTextColor, display: 'block', marginTop: 8, marginBottom: 24 }}>
-                    Forgot password?
-                </Anchor>
-
-                <Checkbox label="Remember me" size="sm" color="green" styles={{
-                    label: {
-                        color: theme.primaryTextColor
-                    }
-                }} />
                 <br />
 
-                {/* Sign In Button */}
+                {/* Sign Up Button */}
                 < Button fullWidth size="md" radius="md" style={{ backgroundColor: theme.accentColor }}>
-                    Log in
-                </Button>
-
-                {/* Remember Me + Divider */}
-                <Stack position="apart" align='center' mt="md">
-                    <Divider size="sm" label="Or" labelPosition="center" style={{ width: '45%' }} />
-                </Stack>
-
-                {/* Google Sign In */}
-                <Button
-                    fullWidth
-                    variant="outline"
-                    leftIcon={<IconBrandGoogle size={18} />}
-                    color="gray"
-                    mt="md"
-                    radius="md"
-                    style={{ borderColor: theme.accentColor, color: theme.accentColor }}
-                >
-                    Sign in with Google
+                    Create Account
                 </Button>
 
                 {/* Footer */}
                 <Text align="center" size="sm" style={{ color: theme.primaryTextColor, marginTop: 16 }}>
-                    Don’t have an account?{' '}
-                    <Anchor href="/signup" style={{ color: theme.accentColor }}>
-                        Sign up here
+                    Already have an account?{' '}
+                    <Anchor href="/login" style={{ color: theme.accentColor }}>
+                        Log in here
                     </Anchor>
                 </Text>
             </Box>
