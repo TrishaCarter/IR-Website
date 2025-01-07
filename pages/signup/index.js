@@ -14,6 +14,24 @@ export default function SignInPage() {
         accentColor: '#629C44',
     }
 
+    // signUpURL is a fake api call until the database gets set up
+    let signUpUrl = "http://localhost:3000/api/signup";
+    let signUp = async () => {
+        console.log('Signing up...');
+        console.log('Email:', email);
+        console.log('Password', password);
+        console.log('Sending request to:', signUpUrl);
+        // let response = await fetch(signUpUrl, {
+        //     method: 'POST',
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({ email: email, password: password })
+        // });
+
+
+    }
+
     return (
         <Center style={{ minHeight: '100vh', backgroundColor: theme.background }}>
             <Box sx={{ minWidth: 400, width: '100%', padding: 24, borderRadius: 8 }}>
