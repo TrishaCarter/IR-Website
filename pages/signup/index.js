@@ -1,10 +1,17 @@
 import { useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebase';
+import { useRouter } from 'next/router';
 
 export default function SignInPage() {
+    const router = useRouter();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    // State used for success or failure message on signup
+    const [signupText, setSignupText] = useState('');
 
     let theme = {
         background: '#16171b',
@@ -14,22 +21,26 @@ export default function SignInPage() {
         accentColor: '#629C44',
     }
 
-    // signUpURL is a fake api call until the database gets set up
-    let signUpUrl = "http://localhost:3000/api/signup";
-    let signUp = async () => {
+    let signUpEmailPass = async () => {
         console.log('Signing up...');
         console.log('Email:', email);
         console.log('Password', password);
-        console.log('Sending request to:', signUpUrl);
-        // let response = await fetch(signUpUrl, {
-        //     method: 'POST',
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     },
-        //     body: JSON.stringify({ email: email, password: password })
-        // });
 
-
+        await createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in
+                const user = userCredential.user;
+                console.log(user);
+                setSignupText('Account created successfully. Redirecting to login page...');
+                router.push('/login');
+                // ...
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage);
+                // ..
+            });
     }
 
     return (
@@ -86,12 +97,17 @@ export default function SignInPage() {
                             }, label: { color: theme.primaryTextColor }
                         }}
                     />
+                    <Text>Password must be atleast 6 characters long</Text>
                 </Stack>
 
                 <br />
 
                 {/* Sign Up Button */}
-                < Button fullWidth size="md" radius="md" style={{ backgroundColor: theme.accentColor }}>
+                < Button
+                    fullWidth size="md" radius="md"
+                    onClick={signUpEmailPass}
+                    style={{ backgroundColor: theme.accentColor }}
+                >
                     Create Account
                 </Button>
 
@@ -101,6 +117,12 @@ export default function SignInPage() {
                     <Anchor href="/login" style={{ color: theme.accentColor }}>
                         Log in here
                     </Anchor>
+                </Text>
+
+                <br />
+
+                <Text align="center" size="sm" style={{ color: theme.primaryTextColor }}>
+                    {signupText}
                 </Text>
             </Box>
         </Center >
