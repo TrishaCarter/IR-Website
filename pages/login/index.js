@@ -1,10 +1,17 @@
 import { useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebase';
+import { useRouter } from 'next/router';
 
 export default function SignInPage() {
+    const router = useRouter();
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    // State used for success or failure message on login
+    const [loginMessage, setLoginMessage] = useState('');
 
     let theme = {
         background: '#16171b',
@@ -13,6 +20,26 @@ export default function SignInPage() {
         secondaryTextColor: '#aaaaaa',
         accentColor: '#629C44',
     }
+
+    let signInEmailPass = async () => {
+        console.log('Signing in...');
+        console.log('Email:', email);
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in
+                const user = userCredential.user;
+                console.log(user);
+                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+                router.push('/dashboard');
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorCode, errorMessage)
+                setLoginMessage('Error: ' + errorMessage);
+            });
+    }
+
 
     return (
         <Center style={{ minHeight: '100vh', backgroundColor: theme.background }}>
@@ -67,7 +94,10 @@ export default function SignInPage() {
                 <br />
 
                 {/* Sign In Button */}
-                < Button fullWidth size="md" radius="md" style={{ backgroundColor: theme.accentColor }}>
+                < Button
+                    fullWidth size="md" radius="md"
+                    onClick={signInEmailPass}
+                    style={{ backgroundColor: theme.accentColor }}>
                     Log in
                 </Button>
 
@@ -95,6 +125,12 @@ export default function SignInPage() {
                     <Anchor href="/signup" style={{ color: theme.accentColor }}>
                         Sign up here
                     </Anchor>
+                </Text>
+
+                <br />
+
+                <Text align="center" size="sm" style={{ color: theme.primaryTextColor, marginTop: 16 }}>
+                    {loginMessage}
                 </Text>
             </Box>
         </Center >
