@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase';
+import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '../../firebase';
 import { useRouter } from 'next/router';
 
 export default function SignInPage() {
@@ -43,6 +43,36 @@ export default function SignInPage() {
             });
     }
 
+    let signupGoogle = async () => {
+        console.log('Signing up with Google...');
+        await signInWithPopup(auth, googleProvider)
+            .then((result) => {
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                // const credential = GoogleAuthProvider.credentialFromResult(result);
+                // const token = credential.accessToken;
+                // // The signed-in user info.
+                // const user = result.user;
+                console.log(result);
+                setSignupText('Account created successfully. Redirecting to login page...');
+
+                // ----------- TODO -------------
+                // Make sure to take account token here to make JWT
+                // ------------------------------
+
+                router.push('/dashboard');
+            }).catch((error) => {
+                // Handle Errors here.
+                // const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(errorMessage);
+                // The email of the user's account used.
+                // const email = error.email;
+                // The AuthCredential type that was used.
+                // const credential = GoogleAuthProvider.credentialFromError(error);
+                // ...
+            });
+    }
+
     return (
         <Center style={{ minHeight: '100vh', backgroundColor: theme.background }}>
             <Box sx={{ minWidth: 400, width: '100%', padding: 24, borderRadius: 8 }}>
@@ -62,6 +92,7 @@ export default function SignInPage() {
                     mt="md"
                     radius="md"
                     style={{ borderColor: theme.accentColor, color: theme.accentColor, minWidth: '300px', width: "25vw" }}
+                    onClick={signupGoogle}
                 >
                     Sign in with Google
                 </Button>
