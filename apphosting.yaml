@@ -16,6 +16,13 @@ env:
     availability:
       - BUILD
       - RUNTIME
+  apiKey: "AIzaSyBlyXFWTShMuU40FRvjuTBHkXdazwTYdtw",
+  authDomain: "irwebsite-444921.firebaseapp.com",
+  projectId: "irwebsite-444921",
+  storageBucket: "irwebsite-444921.firebasestorage.app",
+  messagingSenderId: "205616280235",
+  appId: "1:205616280235:web:bccc526a92d5b87fe5fdee",
+  measurementId: "G-5RLPCPHNXQ"
 
   # Configure secrets
   # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
