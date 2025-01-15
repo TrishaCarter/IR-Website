@@ -28,6 +28,23 @@ export default function SignInPage() {
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
+                let jwt = user.getIdToken();
+
+                fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Success:', data);
+                    })
+                    .catch((error) => {
+                        console.error('Error:', error);
+                    });
+
                 console.log(user);
                 setLoginMessage('Logged in successfully. Redirecting to dashboard...');
                 router.push('/dashboard');
