@@ -28,7 +28,6 @@ export default function SignInPage() {
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
-                let jwt = user.getIdToken();
 
                 fetch('/api/login', {
                     method: 'POST',
@@ -50,7 +49,7 @@ export default function SignInPage() {
 
                 console.log(user);
                 setLoginMessage('Logged in successfully. Redirecting to dashboard...');
-                router.push('/dashboard');
+                // router.push('/dashboard');
             })
             .catch((error) => {
                 const errorCode = error.code;
@@ -63,19 +62,23 @@ export default function SignInPage() {
     let signInGoogle = async () => {
         console.log('Signing in with Google...');
         await signInWithPopup(auth, googleProvider)
-            .then((result) => {
+            .then((userCredential) => {
                 // This gives you a Google Access Token. You can use it to access the Google API.
                 // const credential = GoogleAuthProvider.credentialFromResult(result);
                 // const token = credential.accessToken;
                 // // The signed-in user info.
                 // const user = result.user;
-                console.log(result);
+                console.log(userCredential);
+                let uid = userCredential.user.uid;
+
+                localStorage.setItem('uid', uid);
+
                 setLoginMessage('Logged in successfully. Redirecting to dashboard...');
 
                 // ----------- TODO -------------
                 // Make sure to take account token here to make JWT
                 // ------------------------------
-                router.push('/dashboard');
+                // router.push('/dashboard');
             }).catch((error) => {
                 // Handle Errors here.
                 const errorCode = error.code;
