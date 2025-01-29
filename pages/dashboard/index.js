@@ -11,6 +11,14 @@ export default function DashboardPage() {
     let router = useRouter();
     let [user, setUser] = useState(null);
 
+    let theme = {
+        background: '#16171b',
+        secondaryBackground: '#262729',
+        primaryTextColor: '#c9c9c9',
+        secondaryTextColor: '#aaaaaa',
+        accentColor: '#629C44',
+    }
+
     useEffect(() => {
         let getUser = async () => {
             let userData = await auth.currentUser;
@@ -39,7 +47,7 @@ export default function DashboardPage() {
         }
     }
 
-    return <AppShell>
+    return <AppShell style={{ background: theme.background }}>
         <AppShell.Header>
             <Navbar />
         </AppShell.Header>
