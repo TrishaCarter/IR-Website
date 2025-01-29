@@ -1,13 +1,23 @@
 
-import { Button, Center, Flex, Text, Title } from "@mantine/core"
+import { AppShell, Button, Center, Flex, Text, Title, Header, Group, Anchor } from "@mantine/core"
 import { auth } from "../../firebase"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { getAuth, signOut } from "firebase/auth";
+import Navbar from "../../components/Navbar";
+
 
 export default function DashboardPage() {
     let router = useRouter();
     let [user, setUser] = useState(null);
+
+    let theme = {
+        background: '#16171b',
+        secondaryBackground: '#262729',
+        primaryTextColor: '#c9c9c9',
+        secondaryTextColor: '#aaaaaa',
+        accentColor: '#629C44',
+    }
 
     useEffect(() => {
         let getUser = async () => {
@@ -37,18 +47,26 @@ export default function DashboardPage() {
         }
     }
 
-    return <Center w={"99vw"} h={"99vh"} flex={"column"}>
-        <Flex direction={"column"} align={"center"}>
-            <Title order={1}>Dashboard</Title>
+    return <AppShell style={{ background: theme.background }}>
+        <AppShell.Header>
+            <Navbar />
+        </AppShell.Header>
 
-            <br />
+        <AppShell.Main>
+            <Center w={"99vw"} h={"99vh"} flex={"column"}>
+                <Flex direction={"column"} align={"center"}>
+                    <Title order={1}>Dashboard</Title>
 
-            <Text align="center">Welcome to the dashboard, {user ? user.displayName : null}</Text>
-            <Text align="center">Email: {user ? user.email : null}</Text>
+                    <br />
 
-            <br />
+                    <Text align="center">Welcome to the dashboard, {user ? user.displayName : null}</Text>
+                    <Text align="center">Email: {user ? user.email : null}</Text>
 
-            <Button align="center" onClick={handleLogout}>Log out</Button>
-        </Flex>
-    </Center>
+                    <br />
+
+                    <Button align="center" onClick={handleLogout}>Log out</Button>
+                </Flex>
+            </Center>
+        </AppShell.Main>
+    </AppShell>
 }
