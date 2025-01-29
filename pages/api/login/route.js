@@ -1,5 +1,5 @@
 import { serialize } from 'cookie'
-import { encrypt } from '@/app/lib/session'
+import { encrypt } from '../../../src/lib/session'
 
 export default function handler(req, res) {
     const sessionData = req.body
