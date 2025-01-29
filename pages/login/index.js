@@ -41,6 +41,9 @@ export default function SignInPage() {
                     .then(data => {
                         console.log('Success:', data);
                     })
+                    .then(data => {
+
+                    })
                     .catch((error) => {
                         console.error('Error:', error);
                     });
