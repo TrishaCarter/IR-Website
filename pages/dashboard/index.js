@@ -1,15 +1,17 @@
 
 import { AppShell, Button, Center, Flex, Text, Title, Header, Group, Anchor } from "@mantine/core"
-import { auth } from "../../../firebase"
+import { auth } from "../../firebase"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { getAuth, signOut } from "firebase/auth";
-import Navbar from "../../../components/Navbar";
+import { getUserSession } from "../../handlers";
+import Navbar from "../../components/Navbar";
 
 
 export default function DashboardPage() {
     let router = useRouter();
     let [user, setUser] = useState(null);
+    let [uid, setUid] = useState(null);
 
     let theme = {
         background: '#16171b',
@@ -20,20 +22,11 @@ export default function DashboardPage() {
     }
 
     useEffect(() => {
-        let getUser = async () => {
-            let userData = await auth.currentUser;
+        getUserSession()
+            .then((user) => {
+                setUser(user)
 
-            if (userData == null) {
-                console.log("No user logged in");
-                router.push("/login")
-                return;
-            }
-            console.log(userData);
-
-            setUser(userData);
-        }
-
-        getUser();
+            })
     }, [])
 
     let handleLogout = async () => {
@@ -60,7 +53,7 @@ export default function DashboardPage() {
                     <br />
 
                     <Text align="center">Welcome to the dashboard, {user ? user.displayName : null}</Text>
-                    <Text align="center">Email: {user ? user.email : null}</Text>
+                    <Text align="center">UID: {user}</Text>
 
                     <br />
 

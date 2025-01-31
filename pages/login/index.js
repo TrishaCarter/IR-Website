@@ -3,6 +3,7 @@ import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Header, Divi
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../../firebase';
+import { loginUser } from '@/handlers';
 import { useRouter } from 'next/router';
 
 export default function SignInPage() {
@@ -26,30 +27,22 @@ export default function SignInPage() {
         console.log('Email:', email);
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                // Signed in
-                const user = userCredential.user;
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                // const credential = GoogleAuthProvider.credentialFromResult(result);
+                // const token = credential.accessToken;
+                // // The signed-in user info.
+                // const user = result.user;
+                console.log(userCredential);
+                let uid = userCredential.user.uid;
 
-                fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Success:', data);
-                    })
-                    .then(data => {
+                authenticateUser(uid)
+                    .then(() => {
+                        setLoginMessage('Logged in successfully. Redirecting to dashboard...');
 
-                    })
-                    .catch((error) => {
+                        router.push(`//dashboard`);
+                    }).catch((error) => {
                         console.error('Error:', error);
                     });
-
-                console.log(user);
-                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
-                // router.push('/dashboard');
             })
             .catch((error) => {
                 const errorCode = error.code;
@@ -71,27 +64,27 @@ export default function SignInPage() {
                 console.log(userCredential);
                 let uid = userCredential.user.uid;
 
-                localStorage.setItem('uid', uid);
+                loginUser(uid)
+                    .then(() => {
+                        setLoginMessage('Logged in successfully. Redirecting to dashboard...');
 
-                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+                        router.push(`/dashboard`);
+                    }).catch((error) => {
+                        console.error('Error:', error);
+                    });
 
-                // ----------- TODO -------------
-                // Make sure to take account token here to make JWT
-                // ------------------------------
-                // router.push('/dashboard');
             }).catch((error) => {
                 // Handle Errors here.
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorCode, errorMessage);
-                // The email of the user's account used.
-                const email = error.email;
-                // The AuthCredential type that was used.
-                const credential = GoogleAuthProvider.credentialFromError(error);
+                // // The email of the user's account used.
+                // const email = error.email;
+                // // The AuthCredential type that was used.
+                // const credential = GoogleAuthProvider.credentialFromError(error);
 
             });
     }
-
 
     return (
         <Center style={{ minHeight: '100vh', backgroundColor: theme.background }}>

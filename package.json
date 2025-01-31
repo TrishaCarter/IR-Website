@@ -25,7 +25,10 @@
     "@mantine/hooks": "7.15.1",
     "@next/bundle-analyzer": "^14.2.4",
     "@tabler/icons-react": "^3.26.0",
+    "cookie": "^1.0.2",
     "firebase": "^11.1.0",
+    "jose": "^5.9.6",
+    "jsonwebtoken": "^9.0.2",
     "next": "^15.0.1",
     "react": "18.3.1",
     "react-dom": "18.3.1"
