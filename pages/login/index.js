@@ -4,6 +4,7 @@ import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider, db } from '../../firebase';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
+import { loginUser } from '@/handlers';
 import { useRouter } from 'next/router';
 import { loginUser } from '../../handlers';
 
