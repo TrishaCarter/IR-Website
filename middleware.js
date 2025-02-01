@@ -2,15 +2,15 @@ import { NextResponse } from "next/server";
 import * as jose from "jose"
 
 export async function middleware(req) {
-    let token = req.cookies.get("auth_token").value.toString();
+    let token = req.cookies.get("auth_token")?.value.toString();
     let secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
 
     // console.log("Token:", token);
     // console.log("Secret:", secret);
 
-    // if (!token) {
-    //     return NextResponse.redirect(new URL("/login", req.url));
-    // }
+    if (!token) {
+        return NextResponse.redirect(new URL("/login", req.url));
+    }
 
     try {
         // Verify the token
