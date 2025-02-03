@@ -5,7 +5,11 @@ import {
     browserSessionPersistence, getAuth,
     GoogleAuthProvider, setPersistence,
 } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import {
+    getFirestore, doc,
+    getDoc, setDoc,
+    collection
+} from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -24,11 +28,39 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
-export const db = getFirestore(app, "ir-website-db");
+export const auth = getAuth();
+const db = getFirestore(app);
 
 
 await setPersistence(auth, browserSessionPersistence);
 export const googleProvider = new GoogleAuthProvider();
+
+// Function to pull user's data from Firestore DB
+export async function getUserDBInfo(uid) {
+    console.log("Database:");
+    console.log(db);
+
+
+    // Get reference to user's document
+    let usersRef = doc(db, 'USERS', uid);
+    // Async func to actually get document
+    let docSnap = await getDoc(usersRef);
+
+    if (docSnap.exists()) {
+        return docSnap.data();
+    } else {
+        return false;
+
+    }
+}
+
+// Function to create user doc in DB
+export async function createUserDoc(uid, data) {
+    let userDoc = collection(db, "USERS")
+    console.log(userDoc);
+
+    // await setDoc(doc(db, "USERS", uid), data);
+}
+
 
 export default app;
