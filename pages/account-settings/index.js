@@ -43,22 +43,28 @@ export default function AccountSettings() {
     };
 
     return (
-        <Center style={{ background: theme.background, height: '100vh' }}>
-            <Box sx={{ maxWidth: 400, padding: '20px', background: theme.secondaryBackground, borderRadius: '8px', color: theme.primaryTextColor }}>
-                <Title order={2} mb="md" style={{ color: theme.accentColor }}>Account Settings</Title>
-                <Avatar src={avatar} alt="Profile Picture" size={80} mb="md" />
-                <FileButton onChange={(file) => setAvatar(URL.createObjectURL(file))} accept="image/*">
-                    {(props) => <Button {...props}>Upload New Picture</Button>}
-                </FileButton>
-                <TextInput label="Username" value={username} onChange={(e) => setUsername(e.target.value)} mb="sm" />
-                <TextInput label="Email" value={email} disabled mb="sm" />
-                <PasswordInput label="New Password" value={password} onChange={(e) => setPassword(e.target.value)} mb="sm" />
-                <Switch label="Dark Mode" checked={darkMode} onChange={(event) => setDarkMode(event.currentTarget.checked)} mb="md" />
-                <Group position="apart" mt="md">
-                    <Button onClick={handleUpdateProfile}>Save Changes</Button>
-                    <Button color="red" onClick={handleUpdatePassword}>Update Password</Button>
-                </Group>
-            </Box>
-        </Center>
+        <>
+            <Center style={{ background: theme.background, padding: '40px' }}>
+                <Title order={1} mb="md" style={{ color: theme.primaryTextColor, fontSize: '3rem' }}>Account Settings</Title>
+            </Center>
+            <Center style={{ background: theme.background, height: '100vh' }}>
+                <Box sx={{ maxWidth: 600, padding: '40px', background: theme.secondaryBackground, borderRadius: '8px', color: theme.primaryTextColor }}>
+                    <Center style={{ marginBottom: '30px', flexDirection: 'column' }}>
+                        <Avatar src={avatar} alt="Profile Picture" size={150} mb="md"/> {/* Increased size from 100 to 150 */}
+                        <FileButton onChange={(file) => setAvatar(URL.createObjectURL(file))} accept="image/*"> 
+                            {(props) => <Button {...props} size="md">Upload New Picture</Button>}
+                        </FileButton>
+                    </Center> 
+                    <TextInput label="Username" value={username} onChange={(e) => setUsername(e.target.value)} mb="sm" size="md" />
+                    <TextInput label="Email" value={email} disabled mb="sm" size="md" />
+                    <PasswordInput label="New Password" value={password} onChange={(e) => setPassword(e.target.value)} mb="lg" size="md" />
+                    <Switch label="Dark Mode" checked={darkMode} onChange={(event) => setDarkMode(event.currentTarget.checked)} mb="xl" size="lg" />
+                    <Group position="apart" mt="xl">
+                        <Button onClick={handleUpdateProfile} size="xl">Save Changes</Button>
+                        <Button color="red" onClick={handleUpdatePassword} size="xl">Update Password</Button>
+                    </Group>
+                </Box>
+            </Center>
+        </>
     );
 }
