@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Header, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider } from '../../firebase';
+import { auth, googleProvider, getUserDBInfo, createUserDoc } from '../../firebase';
 import { loginUser } from '@/handlers';
 import { useRouter } from 'next/router';
+import { redirect } from 'next/dist/server/api-utils';
 
 export default function SignInPage() {
     const router = useRouter();
@@ -54,36 +55,53 @@ export default function SignInPage() {
 
     let signInGoogle = async () => {
         console.log('Signing in with Google...');
-        await signInWithPopup(auth, googleProvider)
-            .then((userCredential) => {
-                // This gives you a Google Access Token. You can use it to access the Google API.
-                // const credential = GoogleAuthProvider.credentialFromResult(result);
-                // const token = credential.accessToken;
-                // // The signed-in user info.
-                // const user = result.user;
-                console.log(userCredential);
-                let uid = userCredential.user.uid;
 
-                loginUser(uid)
-                    .then(() => {
-                        setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+        try {
+            // Get results from Google login popup window
+            let popupResult = await signInWithPopup(auth, googleProvider);
+            let user = popupResult.user;
+            let uid = user.uid;
 
-                        router.push(`/dashboard`);
-                    }).catch((error) => {
-                        console.error('Error:', error);
-                    });
+            // Try to get user's information from the database
+            try {
+                let userDBInfo = await getUserDBInfo(uid);
+                console.log('User Info:', userDBInfo);
+                // router.push('/dashboard');
+            } catch (error) {
+                // If user is not in the database, create a new user document
+                const userData = {
+                    name: user.displayName,
+                    email: user.email,
+                    uid: uid,
+                    currency: 0,
+                };
+                try {
+                    createUserDoc(userData);
+                    console.log("User doc created successfully.");
+                    // router.push(`/dashboard`);
+                } catch (error) {
+                    console.error('Error creating user doc:', error);
+                }
 
-            }).catch((error) => {
-                // Handle Errors here.
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode, errorMessage);
-                // // The email of the user's account used.
-                // const email = error.email;
-                // // The AuthCredential type that was used.
-                // const credential = GoogleAuthProvider.credentialFromError(error);
+            }
 
-            });
+
+        } catch (error) {
+            console.error('Popup Error:', error);
+        }
+
+
+        // }).catch((error) => {
+        //     // Handle Errors here.
+        //     const errorCode = error.code;
+        //     const errorMessage = error.message;
+        //     console.log(errorCode, errorMessage);
+        //     // // The email of the user's account used.
+        //     // const email = error.email;
+        //     // // The AuthCredential type that was used.
+        //     // const credential = GoogleAuthProvider.credentialFromError(error);
+
+        // });
     }
 
     return (
