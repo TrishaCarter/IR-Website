@@ -1,10 +1,10 @@
 
 import { AppShell, Button, Center, Flex, Text, Title, Header, Group, Anchor } from "@mantine/core"
-import { auth } from "../../../firebase"
+import { auth } from "../../firebase"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { getAuth, signOut } from "firebase/auth";
-import Navbar from "../../../components/Navbar";
+import Navbar from "../../components/Navbar";
 
 
 export default function DashboardPage() {
