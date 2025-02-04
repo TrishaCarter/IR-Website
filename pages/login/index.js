@@ -5,6 +5,7 @@ import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider, db } from '../../firebase';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
+import { loginUser } from '../../handlers';
 
 export default function SignInPage() {
     const router = useRouter();
@@ -83,7 +84,11 @@ export default function SignInPage() {
             if (userDoc) {
                 console.log('User data found:', userDoc);
                 setLoginMessage('Logged in successfully. Redirecting to dashboard...');
-                router.push('/signup');
+                loginUser(uid).then(() => {
+                    router.push('/dashboard');
+                }).catch((error) => {
+                    console.error('Error with User Cookie:', error);
+                });
                 return;
             }
 
