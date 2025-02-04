@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { TextInput, PasswordInput, Button, Switch, Group, Box, Title, Avatar, FileButton, Center } from '@mantine/core';
 import { auth } from '../../firebase';
 import { updateProfile, updatePassword } from 'firebase/auth';
+import Navbar from "../../components/Navbar";
 
 const theme = {
     background: '#16171b',
@@ -44,10 +45,9 @@ export default function AccountSettings() {
 
     return (
         <>
-            <Center style={{ background: theme.background, padding: '40px' }}>
+            <Navbar />
+            <Center style={{ background: theme.background, minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <Title order={1} mb="md" style={{ color: theme.primaryTextColor, fontSize: '3rem' }}>Account Settings</Title>
-            </Center>
-            <Center style={{ background: theme.background, height: '100vh' }}>
                 <Box sx={{ maxWidth: 600, padding: '40px', background: theme.secondaryBackground, borderRadius: '8px', color: theme.primaryTextColor }}>
                     <Center style={{ marginBottom: '30px', flexDirection: 'column' }}>
                         <Avatar src={avatar} alt="Profile Picture" size={150} mb="md"/> {/* Increased size from 100 to 150 */}
