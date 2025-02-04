@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { TextInput, PasswordInput, Button, Switch, Group, Box, Title, Avatar, FileButton, Center } from '@mantine/core';
 import { auth } from '../../firebase';
 import { updateProfile, updatePassword } from 'firebase/auth';
@@ -18,7 +18,11 @@ export default function AccountSettings() {
     const [email, setEmail] = useState(user?.email || '');
     const [password, setPassword] = useState('');
     const [darkMode, setDarkMode] = useState(false);
-    const [avatar, setAvatar] = useState(user?.photoURL || '');
+    const [avatar, setAvatar] = useState('');
+
+    useEffect(() => {
+        setAvatar(user?.photoURL || '');
+    }, [user]);
     
     const handleUpdateProfile = async () => {
         try {
