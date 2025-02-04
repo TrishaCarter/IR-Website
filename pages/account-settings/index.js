@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TextInput, PasswordInput, Button, Switch, Group, Box, Title, Avatar, FileButton, Center } from '@mantine/core';
 import { auth } from '../../firebase';
 import { updateProfile, updatePassword } from 'firebase/auth';
+import { getAuth, signOut } from "firebase/auth";
+import { useRouter } from "next/router"
 import Navbar from "../../components/Navbar";
 
 const theme = {
@@ -13,12 +15,33 @@ const theme = {
 };
 
 export default function AccountSettings() {
-    const user = auth.currentUser;
-    const [username, setUsername] = useState(user?.displayName || '');
-    const [email, setEmail] = useState(user?.email || '');
+    const router = useRouter();
+    const [user, setUser] = useState(null);
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [darkMode, setDarkMode] = useState(false);
-    const [avatar, setAvatar] = useState(user?.photoURL || '');
+    const [avatar, setAvatar] = useState('');
+
+    useEffect(() => {
+        let getUser = async () => {
+            let userData = await auth.currentUser;
+
+            if (userData == null) {
+                console.log("No user logged in");
+                router.push("/login")
+                return;
+            }
+            console.log(userData);
+
+            setUser(userData);
+            setUsername(userData.displayName || '');
+            setEmail(userData.email || '');
+            setAvatar(userData.photoURL || '');
+        }
+
+        getUser();
+    }, [])
     
     const handleUpdateProfile = async () => {
         try {
