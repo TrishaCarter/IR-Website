@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Header, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider, getUserDBInfo, createUserDoc } from '../../firebase';
-import { loginUser } from '@/handlers';
+import { auth, googleProvider, db } from '../../firebase';
+import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { useRouter } from 'next/router';
-import { redirect } from 'next/dist/server/api-utils';
 
 export default function SignInPage() {
     const router = useRouter();
@@ -21,6 +20,27 @@ export default function SignInPage() {
         primaryTextColor: '#c9c9c9',
         secondaryTextColor: '#aaaaaa',
         accentColor: '#629C44',
+    }
+
+    let createUserDoc = async (uid, data) => {
+        try {
+            await setDoc(doc(db, 'USERS', uid), data);
+        } catch (error) {
+            console.error('Firestore Error: ', error);
+        }
+    }
+
+    let getUserDoc = async (uid) => {
+        let docRef = doc(db, 'USERS', uid);
+        let docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            console.log("Document data:", docSnap.data());
+            return docSnap.data();
+        } else {
+            console.log("No such document!");
+            return null;
+        }
     }
 
     let signInEmailPass = async () => {
@@ -40,7 +60,7 @@ export default function SignInPage() {
                     .then(() => {
                         setLoginMessage('Logged in successfully. Redirecting to dashboard...');
 
-                        router.push(`//dashboard`);
+                        router.push(`/dashboard`);
                     }).catch((error) => {
                         console.error('Error:', error);
                     });
@@ -54,54 +74,39 @@ export default function SignInPage() {
     }
 
     let signInGoogle = async () => {
-        console.log('Signing in with Google...');
 
         try {
-            // Get results from Google login popup window
-            let popupResult = await signInWithPopup(auth, googleProvider);
-            let user = popupResult.user;
-            let uid = user.uid;
+            let gAuth = await signInWithPopup(auth, googleProvider);
+            let uid = gAuth.user.uid;
 
-            // Try to get user's information from the database
-            try {
-                let userDBInfo = await getUserDBInfo(uid);
-                console.log('User Info:', userDBInfo);
-                // router.push('/dashboard');
-            } catch (error) {
-                // If user is not in the database, create a new user document
-                const userData = {
-                    name: user.displayName,
-                    email: user.email,
-                    uid: uid,
-                    currency: 0,
-                };
-                try {
-                    createUserDoc(userData);
-                    console.log("User doc created successfully.");
-                    // router.push(`/dashboard`);
-                } catch (error) {
-                    console.error('Error creating user doc:', error);
-                }
-
+            let userDoc = await getUserDoc(uid);
+            if (userDoc) {
+                console.log('User data found:', userDoc);
+                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+                router.push('/signup');
+                return;
             }
 
+            let userData = {
+                email: gAuth.user.email,
+                displayName: gAuth.user.displayName,
+                photoURL: gAuth.user.photoURL,
+                uid: gAuth.user.uid,
+            }
+
+            try {
+                createUserDoc(uid, userData);
+                console.log("User data created successfully.");
+                router.push('/dashboard');
+            } catch (error) {
+                console.error('Error creating user data:', error);
+            }
 
         } catch (error) {
-            console.error('Popup Error:', error);
+            console.log("Error with Google Sign In Popup:")
+            console.error(error);
         }
 
-
-        // }).catch((error) => {
-        //     // Handle Errors here.
-        //     const errorCode = error.code;
-        //     const errorMessage = error.message;
-        //     console.log(errorCode, errorMessage);
-        //     // // The email of the user's account used.
-        //     // const email = error.email;
-        //     // // The AuthCredential type that was used.
-        //     // const credential = GoogleAuthProvider.credentialFromError(error);
-
-        // });
     }
 
     return (
@@ -173,7 +178,7 @@ export default function SignInPage() {
                 <Button
                     fullWidth
                     variant="outline"
-                    leftIcon={<IconBrandGoogle size={18} />}
+                    // leftIcon={<IconBrandGoogle size={18} />}
                     color="gray"
                     mt="md"
                     radius="md"
