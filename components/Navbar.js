@@ -35,7 +35,7 @@ export default function Navbar() {
                         <Anchor href={"/profile"}>Profile</Anchor>
                     </Menu.Item>
                     <Menu.Item>
-                        <Anchor href={"/settings"}>Settings</Anchor>
+                        <Anchor href={"/account-settings"}>Settings</Anchor>
                     </Menu.Item>
                     <Menu.Item>
                         Log Out
