@@ -1,4 +1,5 @@
-import { Flex, Group, Anchor, Space, Text } from "@mantine/core"
+import { Flex, Group, Anchor, Space, Text, Button, Menu } from "@mantine/core"
+
 
 export default function Navbar() {
 
@@ -18,7 +19,29 @@ export default function Navbar() {
                 <Anchor href={"/dashboard"} style={{ color: theme.accentColor }}>Dashboard</Anchor>
                 <Anchor href={"/problems"} style={{ color: theme.accentColor }}>Problems</Anchor>
             </Group>
-            <Text>Account</Text>
+            <Menu
+                transitionProps={{ transition: 'pop-top-right' }}
+                position="top-end"
+                width={220}
+                withinPortal
+            >
+                <Menu.Target>
+                    <Text>
+                        Account
+                    </Text>
+                </Menu.Target>
+                <Menu.Dropdown>
+                    <Menu.Item>
+                        <Anchor href={"/profile"}>Profile</Anchor>
+                    </Menu.Item>
+                    <Menu.Item>
+                        <Anchor href={"/settings"}>Settings</Anchor>
+                    </Menu.Item>
+                    <Menu.Item>
+                        Log Out
+                    </Menu.Item>
+                </Menu.Dropdown>
+            </Menu>
         </Flex>
     )
 }
