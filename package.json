@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "analyze": "ANALYZE=true next build",
-    "start": "next start",
+    "start": "next start -p $PORT",
     "export": "next build && next export",
     "typecheck": "tsc --noEmit",
     "lint": "npm run eslint && npm run stylelint",
@@ -25,7 +25,7 @@
     "@mantine/hooks": "7.15.1",
     "@next/bundle-analyzer": "^14.2.4",
     "@tabler/icons-react": "^3.26.0",
-    "dotenv": "^16.4.7",
+    "cookie": "^1.0.2",
     "firebase": "^11.1.0",
     "next": "^15.0.1",
     "react": "18.3.1",
@@ -64,5 +64,7 @@
     "typescript": "5.5.2",
     "typescript-eslint": "^8.14.0"
   },
-  "packageManager": "yarn@4.5.3"
+  "engines": {
+    "node": "20.x"
+  }
 }

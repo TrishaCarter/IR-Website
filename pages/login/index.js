@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Header, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
+import { useState } from 'react';
+import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '../../firebase';
@@ -40,9 +40,6 @@ export default function SignInPage() {
                     .then(response => response.json())
                     .then(data => {
                         console.log('Success:', data);
-                    })
-                    .then(data => {
-
                     })
                     .catch((error) => {
                         console.error('Error:', error);

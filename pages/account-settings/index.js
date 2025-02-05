@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TextInput, PasswordInput, Button, Switch, Group, Box, Title, Avatar, FileButton, Center } from '@mantine/core';
 import { auth } from '../../firebase';
+import { useRouter } from "next/router"
 import { updateProfile, updatePassword } from 'firebase/auth';
 import Navbar from "../../components/Navbar";
 
@@ -20,9 +21,16 @@ export default function AccountSettings() {
     const [darkMode, setDarkMode] = useState(false);
     const [avatar, setAvatar] = useState('');
 
+    const router = useRouter();
+
     useEffect(() => {
+        if (!user) {
+            console.log("No user logged in");
+            router.push("/login");
+            return;
+        }
         setAvatar(user?.photoURL || '');
-    }, [user]);
+    }, [user, router]);
     
     const handleUpdateProfile = async () => {
         try {
