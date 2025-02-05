@@ -2,25 +2,33 @@
 import { Container, Space, Text, SimpleGrid, Box, Divider, Button, Stack, Flex, Grid, Avatar, Center, Title, Badge } from "@mantine/core"
 import Navbar from "../../components/Navbar"
 import { useRouter } from "next/router"
-import { auth } from "../../firebase"
+import { auth, getUserDoc } from "../../firebase"
 import { useState, useEffect } from "react"
 
 export default function Profile() {
     let router = useRouter()
     let [user, setUser] = useState(null);
+    let [userDBInfo, setUserDBInfo] = useState(null);
 
     useEffect(() => {
         let getUser = async () => {
-            let userData = await auth.currentUser;
+            let userAuth = await auth.currentUser;
 
-            if (userData == null) {
+            if (userAuth == null) {
                 console.log("No user logged in");
                 router.push("/login")
                 return;
             }
-            console.log(userData);
+            setUser(userAuth);
 
-            setUser(userData);
+            let userDB = await getUserDoc(userAuth.uid);
+            if (userDB == null) {
+                console.log("No user data found in database");
+                return;
+            }
+            setUserDBInfo(userDB);
+            console.log(userDB);
+
         }
 
         getUser();
@@ -118,8 +126,8 @@ export default function Profile() {
             <Grid.Col span={4}>
                 <Box style={boxStyling}>
                     <Flex direction="column" align="center" justify="center">
-                        <Avatar radius={"xl"} size={"xl"} />
-                        <Title order={2}>{userInfo.username}</Title>
+                        <Avatar src={user?.photoURL || ""} radius={"xl"} size={"xl"} />
+                        <Title order={2}>{userDBInfo?.displayName}</Title>
                         <Button w={"70%"} mt={10} color={theme.accentColor} onClick={() => router.push("account-settings")}>Account Settings</Button>
                     </Flex>
                     <Space h="md" />

@@ -33,31 +33,25 @@ export const db = getFirestore(app, "ir-website-db");
 await setPersistence(auth, browserSessionPersistence);
 export const googleProvider = new GoogleAuthProvider();
 
-// Function to pull user's data from Firestore DB
-export async function getUserDBInfo(uid) {
-    console.log("Database:");
-    console.log(db);
-
-
-    // Get reference to user's document
-    let usersRef = doc(db, 'USERS', uid);
-    // Async func to actually get document
-    let docSnap = await getDoc(usersRef);
-
-    if (docSnap.exists()) {
-        return docSnap.data();
-    } else {
-        return false;
-
+export let createUserDoc = async (uid, data) => {
+    try {
+        await setDoc(doc(db, 'USERS', uid), data);
+    } catch (error) {
+        console.error('Firestore Error: ', error);
     }
 }
 
-// Function to create user doc in DB
-export async function createUserDoc(uid, data) {
-    let userDoc = collection(db, "USERS")
-    console.log(userDoc);
+export let getUserDoc = async (uid) => {
+    let docRef = doc(db, 'USERS', uid);
+    let docSnap = await getDoc(docRef);
 
-    await setDoc(doc(db, "USERS", uid), data);
+    if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        return docSnap.data();
+    } else {
+        console.log("No such document!");
+        return null;
+    }
 }
 
 
