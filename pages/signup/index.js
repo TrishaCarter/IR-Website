@@ -51,13 +51,11 @@ export default function SignInPage() {
                 const user = userCredential.user;
                 setSignupText('Account created successfully. Redirecting to login page...');
                 router.push('/login');
-                // ...
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorCode, errorMessage);
-                // ..
             });
     }
 

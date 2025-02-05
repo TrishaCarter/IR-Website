@@ -35,8 +35,19 @@ export default function Navbar() {
         accentColor: '#629C44',
     }
 
+    let handleLogout = async () => {
+        try {
+            let auth = getAuth();
+            signOut(auth);
+            console.log("User successfully logged out");
+            router.push("/login");
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    }
+
     return (
-        <Flex justify={"space-between"} align={"center"} w={"100%"} p={"lg"} style={{ background: theme.secondaryBackground }}>
+        <Flex justify={"space-between"} align={"center"} w={"100%"} p={"lg"} h={"10vh"} style={{ background: theme.secondaryBackground }}>
             <Group>
                 <Text>Logo</Text>
                 <Space w={"lg"} />
@@ -59,7 +70,7 @@ export default function Navbar() {
                     <Menu.Item>
                         <Anchor href={"/account-settings"} c={theme.accentColor}>Settings</Anchor>
                     </Menu.Item>
-                    <Menu.Item>
+                    <Menu.Item onClick={handleLogout} variant="light" c={"red"}>
                         Log Out
                     </Menu.Item>
                 </Menu.Dropdown>
