@@ -1,7 +1,32 @@
-import { Flex, Group, Anchor, Space, Text, Button, Menu } from "@mantine/core"
-
+import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar } from "@mantine/core"
+import { useEffect, useState } from "react";
+import { auth } from "../firebase";
+import { useRouter } from "next/router";
 
 export default function Navbar() {
+    let router = useRouter();
+    let [user, setUser] = useState(null);
+    let [avatar, setAvatar] = useState('');
+
+    useEffect(() => {
+        let getUser = async () => {
+            let userData = await auth.currentUser;
+
+            if (userData == null) {
+                console.log("No user logged in");
+                router.push("/login")
+                return;
+            }
+            console.log(userData);
+            setUser(userData);
+        }
+
+        getUser();
+    }, [])
+
+    useEffect(() => {
+        setAvatar(user?.photoURL || '');
+    }, [user]);
 
     let theme = {
         background: '#16171b',
@@ -11,8 +36,18 @@ export default function Navbar() {
         accentColor: '#629C44',
     }
 
+    let handleLogout = async () => {
+        try {
+            await auth.signOut();
+            console.log("User successfully logged out");
+            router.push("/login");
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+    }
+
     return (
-        <Flex justify={"space-between"} align={"center"} w={"100%"} p={"lg"} style={{ background: theme.secondaryBackground }}>
+        <Flex justify={"space-between"} align={"center"} w={"100%"} p={"lg"} h={"10vh"} style={{ background: theme.secondaryBackground }}>
             <Group>
                 <Text>Logo</Text>
                 <Space w={"lg"} />
@@ -26,18 +61,16 @@ export default function Navbar() {
                 withinPortal
             >
                 <Menu.Target>
-                    <Text>
-                        Account
-                    </Text>
+                    <Avatar src={avatar} size={30} m={0} />
                 </Menu.Target>
                 <Menu.Dropdown>
                     <Menu.Item>
-                        <Anchor href={"/profile"}>Profile</Anchor>
+                        <Anchor href={"/profile"} c={theme.accentColor}>Profile</Anchor>
                     </Menu.Item>
                     <Menu.Item>
-                        <Anchor href={"/account-settings"}>Settings</Anchor>
+                        <Anchor href={"/account-settings"} c={theme.accentColor}>Settings</Anchor>
                     </Menu.Item>
-                    <Menu.Item>
+                    <Menu.Item onClick={handleLogout} variant="light" c={"red"}>
                         Log Out
                     </Menu.Item>
                 </Menu.Dropdown>

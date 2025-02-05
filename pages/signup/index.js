@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
 import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider } from '../../firebase';
+import { getDoc, setDoc, doc } from 'firebase/firestore';
+import { loginUser } from '@/handlers';
+import { auth, googleProvider, db } from '../../firebase';
 import { useRouter } from 'next/router';
 
 export default function SignInPage() {
@@ -21,56 +23,76 @@ export default function SignInPage() {
         accentColor: '#629C44',
     }
 
-    let signUpEmailPass = async () => {
-        console.log('Signing up...');
-        console.log('Email:', email);
-        console.log('Password', password);
+    let createUserDoc = async (uid, data) => {
+        try {
+            await setDoc(doc(db, 'USERS', uid), data);
+        } catch (error) {
+            console.error('Firestore Error: ', error);
+        }
+    }
 
+    let getUserDoc = async (uid) => {
+        let docRef = doc(db, 'USERS', uid);
+        let docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            console.log("Document data:", docSnap.data());
+            return docSnap.data();
+        } else {
+            console.log("No such document!");
+            return null;
+        }
+    }
+
+    let signUpEmailPass = async () => {
         await createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
-                console.log(user);
                 setSignupText('Account created successfully. Redirecting to login page...');
                 router.push('/login');
-                // ...
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorCode, errorMessage);
-                // ..
             });
     }
 
     let signupGoogle = async () => {
-        console.log('Signing up with Google...');
-        await signInWithPopup(auth, googleProvider)
-            .then((result) => {
-                // This gives you a Google Access Token. You can use it to access the Google API.
-                // const credential = GoogleAuthProvider.credentialFromResult(result);
-                // const token = credential.accessToken;
-                // // The signed-in user info.
-                // const user = result.user;
-                console.log(result);
-                setSignupText('Account created successfully. Redirecting to login page...');
+        try {
+            let gAuth = await signInWithPopup(auth, googleProvider);
+            let uid = gAuth.user.uid;
 
-                // ----------- TODO -------------
-                // Make sure to take account token here to make JWT
-                // ------------------------------
+            let userDoc = await getUserDoc(uid);
+            if (userDoc) {
+                console.log('User data found:', userDoc);
+                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+                loginUser(uid).then(() => {
+                    router.push('/dashboard');
+                }).catch((error) => {
+                    console.error('Error with User Cookie:', error);
+                });
+                return;
+            }
 
+            let userData = {
+                email: gAuth.user.email,
+                displayName: gAuth.user.displayName,
+            }
+
+            try {
+                createUserDoc(uid, userData);
+                console.log("User data created successfully.");
                 router.push('/dashboard');
-            }).catch((error) => {
-                // Handle Errors here.
-                // const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorMessage);
-                // The email of the user's account used.
-                // const email = error.email;
-                // The AuthCredential type that was used.
-                // const credential = GoogleAuthProvider.credentialFromError(error);
-                // ...
-            });
+            } catch (error) {
+                console.error('Error creating user data:', error);
+            }
+
+        } catch (error) {
+            console.log("Error with Google Sign In Popup:")
+            console.error(error);
+        }
     }
 
     return (
