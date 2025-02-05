@@ -45,33 +45,39 @@ export default function SignInPage() {
     }
 
     let signInEmailPass = async () => {
-        console.log('Signing in...');
-        console.log('Email:', email);
-        signInWithEmailAndPassword(auth, email, password)
-            .then((userCredential) => {
-                // This gives you a Google Access Token. You can use it to access the Google API.
-                // const credential = GoogleAuthProvider.credentialFromResult(result);
-                // const token = credential.accessToken;
-                // // The signed-in user info.
-                // const user = result.user;
-                console.log(userCredential);
-                let uid = userCredential.user.uid;
+        try {
+            let gAuth = await signInWithEmailAndPassword(auth, email, password);
+            let uid = gAuth.user.uid;
 
-                authenticateUser(uid)
-                    .then(() => {
-                        setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+            let userDoc = await getUserDoc(uid);
+            if (userDoc) {
+                console.log('User data found:', userDoc);
+                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+                loginUser(uid).then(() => {
+                    router.push('/dashboard');
+                }).catch((error) => {
+                    console.error('Error with User Cookie:', error);
+                });
+                return;
+            }
 
-                        router.push(`/dashboard`);
-                    }).catch((error) => {
-                        console.error('Error:', error);
-                    });
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                console.log(errorCode, errorMessage)
-                setLoginMessage('Error: ' + errorMessage);
-            });
+            let userData = {
+                email: gAuth.user.email,
+                displayName: gAuth.user.displayName
+            }
+
+            try {
+                createUserDoc(uid, userData);
+                console.log("User data created successfully.");
+                router.push('/dashboard');
+            } catch (error) {
+                console.error('Error creating user data:', error);
+            }
+
+        } catch (error) {
+            console.log("Error with Google Sign In Popup:")
+            console.error(error);
+        }
     }
 
     let signInGoogle = async () => {
@@ -95,8 +101,6 @@ export default function SignInPage() {
             let userData = {
                 email: gAuth.user.email,
                 displayName: gAuth.user.displayName,
-                photoURL: gAuth.user.photoURL,
-                uid: gAuth.user.uid,
             }
 
             try {
