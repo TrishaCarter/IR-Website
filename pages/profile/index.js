@@ -2,9 +2,29 @@
 import { Container, Space, Text, SimpleGrid, Box, Divider, Button, Stack, Flex, Grid, Avatar, Center, Title, Badge } from "@mantine/core"
 import Navbar from "../../components/Navbar"
 import { useRouter } from "next/router"
+import { auth } from "../../firebase"
+import { useEffect } from "react"
 
 export default function Profile() {
     let router = useRouter()
+
+    useEffect(() => {
+        let getUser = async () => {
+            let userData = await auth.currentUser;
+
+            if (userData == null) {
+                console.log("No user logged in");
+                router.push("/login")
+                return;
+            }
+            console.log(userData);
+
+            setUser(userData);
+        }
+
+        getUser();
+    }, [])
+
     let theme = {
         background: '#16171b',
         secondaryBackground: '#262729',

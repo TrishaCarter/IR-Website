@@ -3,6 +3,7 @@ import { TextInput, PasswordInput, Button, Switch, Group, Box, Title, Avatar, Fi
 import { auth } from '../../firebase';
 import { updateProfile, updatePassword } from 'firebase/auth';
 import Navbar from "../../components/Navbar";
+import { useRouter } from 'next/router';
 
 const theme = {
     background: '#16171b',
@@ -13,6 +14,7 @@ const theme = {
 };
 
 export default function AccountSettings() {
+    let router = useRouter();
     const user = auth.currentUser;
     const [username, setUsername] = useState(user?.displayName || '');
     const [email, setEmail] = useState(user?.email || '');
@@ -23,7 +25,24 @@ export default function AccountSettings() {
     useEffect(() => {
         setAvatar(user?.photoURL || '');
     }, [user]);
-    
+
+    useEffect(() => {
+        let getUser = async () => {
+            let userData = await auth.currentUser;
+
+            if (userData == null) {
+                console.log("No user logged in");
+                router.push("/login")
+                return;
+            }
+            console.log(userData);
+
+            setUser(userData);
+        }
+
+        getUser();
+    }, [])
+
     const handleUpdateProfile = async () => {
         try {
             await updateProfile(user, {
@@ -54,11 +73,11 @@ export default function AccountSettings() {
                 <Title order={1} mb="md" style={{ color: theme.primaryTextColor, fontSize: '3rem' }}>Account Settings</Title>
                 <Box sx={{ maxWidth: 600, padding: '40px', background: theme.secondaryBackground, borderRadius: '8px', color: theme.primaryTextColor }}>
                     <Center style={{ marginBottom: '30px', flexDirection: 'column' }}>
-                        <Avatar src={avatar} alt="Profile Picture" size={150} mb="md"/> {/* Increased size from 100 to 150 */}
-                        <FileButton onChange={(file) => setAvatar(URL.createObjectURL(file))} accept="image/*"> 
+                        <Avatar src={avatar} alt="Profile Picture" size={150} mb="md" /> {/* Increased size from 100 to 150 */}
+                        <FileButton onChange={(file) => setAvatar(URL.createObjectURL(file))} accept="image/*">
                             {(props) => <Button {...props} size="md">Upload New Picture</Button>}
                         </FileButton>
-                    </Center> 
+                    </Center>
                     <TextInput label="Username" value={username} onChange={(e) => setUsername(e.target.value)} mb="sm" size="md" />
                     <TextInput label="Email" value={email} disabled mb="sm" size="md" />
                     <PasswordInput label="New Password" value={password} onChange={(e) => setPassword(e.target.value)} mb="lg" size="md" />
