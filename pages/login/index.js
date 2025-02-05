@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Header, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
 import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
-import { auth, googleProvider } from '../../firebase';
+import { auth, googleProvider, db } from '../../firebase';
+import { getDoc, setDoc, doc } from 'firebase/firestore';
+import { loginUser } from '@/handlers';
 import { useRouter } from 'next/router';
 
 export default function SignInPage() {
@@ -21,36 +23,48 @@ export default function SignInPage() {
         accentColor: '#629C44',
     }
 
+    let createUserDoc = async (uid, data) => {
+        try {
+            await setDoc(doc(db, 'USERS', uid), data);
+        } catch (error) {
+            console.error('Firestore Error: ', error);
+        }
+    }
+
+    let getUserDoc = async (uid) => {
+        let docRef = doc(db, 'USERS', uid);
+        let docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            console.log("Document data:", docSnap.data());
+            return docSnap.data();
+        } else {
+            console.log("No such document!");
+            return null;
+        }
+    }
+
     let signInEmailPass = async () => {
         console.log('Signing in...');
         console.log('Email:', email);
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                // Signed in
-                const user = userCredential.user;
-                let jwt = user.getIdToken();
+                // This gives you a Google Access Token. You can use it to access the Google API.
+                // const credential = GoogleAuthProvider.credentialFromResult(result);
+                // const token = credential.accessToken;
+                // // The signed-in user info.
+                // const user = result.user;
+                console.log(userCredential);
+                let uid = userCredential.user.uid;
 
-                fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ email })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        console.log('Success:', data);
-                    })
-                    .then(data => {
+                authenticateUser(uid)
+                    .then(() => {
+                        setLoginMessage('Logged in successfully. Redirecting to dashboard...');
 
-                    })
-                    .catch((error) => {
+                        router.push(`/dashboard`);
+                    }).catch((error) => {
                         console.error('Error:', error);
                     });
-
-                console.log(user);
-                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
-                router.push('/dashboard');
             })
             .catch((error) => {
                 const errorCode = error.code;
@@ -81,6 +95,8 @@ export default function SignInPage() {
             let userData = {
                 email: gAuth.user.email,
                 displayName: gAuth.user.displayName,
+                photoURL: gAuth.user.photoURL,
+                uid: gAuth.user.uid,
             }
 
             try {
@@ -97,7 +113,6 @@ export default function SignInPage() {
         }
 
     }
-
 
     return (
         <Center style={{ minHeight: '100vh', backgroundColor: theme.background }}>
@@ -168,7 +183,7 @@ export default function SignInPage() {
                 <Button
                     fullWidth
                     variant="outline"
-                    leftIcon={<IconBrandGoogle size={18} />}
+                    // leftIcon={<IconBrandGoogle size={18} />}
                     color="gray"
                     mt="md"
                     radius="md"
