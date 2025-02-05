@@ -81,10 +81,9 @@ export default function Profile() {
         ]
     }
 
-    return <Flex direction="column" align={"center"}>
+    return <Flex direction="column" align={"center"} h={"100vh"}>
         <Navbar />
-        <Space h="lg" />
-        <Grid grow columns={12} w={"90%"}>
+        <Grid grow columns={12} w={"100vw"} h={"90vh"} p={"lg"} bg={theme.background}>
             <Grid.Col span={8}>
                 <Box style={boxStyling}>
                     <Title align="center" order={3}>Problems</Title>
@@ -127,7 +126,7 @@ export default function Profile() {
                 <Box style={boxStyling}>
                     <Flex direction="column" align="center" justify="center">
                         <Avatar src={user?.photoURL || ""} radius={"xl"} size={"xl"} />
-                        <Title order={2}>{userDBInfo?.displayName}</Title>
+                        <Title order={2}>{user?.displayName || "User"}</Title>
                         <Button w={"70%"} mt={10} color={theme.accentColor} onClick={() => router.push("account-settings")}>Account Settings</Button>
                     </Flex>
                     <Space h="md" />

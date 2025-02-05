@@ -15,7 +15,7 @@ const theme = {
 
 export default function AccountSettings() {
     let router = useRouter();
-    const user = auth.currentUser;
+    const [user, setUser] = useState(null);
     const [username, setUsername] = useState(user?.displayName || '');
     const [email, setEmail] = useState(user?.email || '');
     const [password, setPassword] = useState('');

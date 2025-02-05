@@ -26,13 +26,14 @@ export default function DashboardPage() {
     useEffect(() => {
         let getUser = async () => {
             let userData = await auth.currentUser;
+            console.log(userData);
+
 
             if (userData == null) {
                 console.log("No user logged in");
                 router.push("/login")
                 return;
             }
-            console.log(userData);
 
             setUser(userData);
         }

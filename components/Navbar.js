@@ -1,15 +1,12 @@
 import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar } from "@mantine/core"
 import { useEffect, useState } from "react";
 import { auth } from "../firebase";
+import { useRouter } from "next/router";
 
 export default function Navbar() {
-
+    let router = useRouter();
     let [user, setUser] = useState(null);
     let [avatar, setAvatar] = useState('');
-
-    useEffect(() => {
-        setAvatar(user?.photoURL || '');
-    }, [user]);
 
     useEffect(() => {
         let getUser = async () => {
@@ -27,6 +24,10 @@ export default function Navbar() {
         getUser();
     }, [])
 
+    useEffect(() => {
+        setAvatar(user?.photoURL || '');
+    }, [user]);
+
     let theme = {
         background: '#16171b',
         secondaryBackground: '#262729',
@@ -37,8 +38,7 @@ export default function Navbar() {
 
     let handleLogout = async () => {
         try {
-            let auth = getAuth();
-            signOut(auth);
+            await auth.signOut();
             console.log("User successfully logged out");
             router.push("/login");
         } catch (error) {
