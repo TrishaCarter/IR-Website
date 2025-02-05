@@ -3,10 +3,11 @@ import { Container, Space, Text, SimpleGrid, Box, Divider, Button, Stack, Flex, 
 import Navbar from "../../components/Navbar"
 import { useRouter } from "next/router"
 import { auth } from "../../firebase"
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 
 export default function Profile() {
     let router = useRouter()
+    let [user, setUser] = useState(null);
 
     useEffect(() => {
         let getUser = async () => {
@@ -40,7 +41,7 @@ export default function Profile() {
         borderRadius: "8px",
     }
 
-    let user = {
+    let userInfo = {
         username: "Username",
         languages: ["Python", "Java", "C++", "JavaScript"],
         skills: ["Data Structures", "Algorithms", "Web Development", "Machine Learning"],
@@ -84,7 +85,7 @@ export default function Profile() {
                     <Space h="md" />
                     <Title order={3}>Unsolved Problems</Title>
                     <Divider my={10} />
-                    {user.curProblems.map((prob) => <>
+                    {userInfo.curProblems.map((prob) => <>
                         <Grid columns={12} w={"95%"} grow h={90}>
                             <Grid.Col span={3}>
                                 <Flex justify={"center"} align={"center"} h={"100%"}>
@@ -118,7 +119,7 @@ export default function Profile() {
                 <Box style={boxStyling}>
                     <Flex direction="column" align="center" justify="center">
                         <Avatar radius={"xl"} size={"xl"} />
-                        <Title order={2}>{user.username}</Title>
+                        <Title order={2}>{userInfo.username}</Title>
                         <Button w={"70%"} mt={10} color={theme.accentColor} onClick={() => router.push("account-settings")}>Account Settings</Button>
                     </Flex>
                     <Space h="md" />
@@ -127,7 +128,7 @@ export default function Profile() {
                     <Stack spacing="md">
                         <Title order={3}>Languages</Title>
                         <Box>
-                            {user.languages.map((language) => <Badge color={theme.accentColor} m={8} variant="light">{language}</Badge>)}
+                            {userInfo.languages.map((language) => <Badge color={theme.accentColor} m={8} variant="light">{language}</Badge>)}
                         </Box>
                     </Stack>
                     <Space h="md" />
@@ -136,7 +137,7 @@ export default function Profile() {
                     <Stack spacing="md">
                         <Title order={3}>Skills</Title>
                         <Box>
-                            {user.skills.map((skill) => <Badge color={theme.accentColor} m={8} variant="light">{skill}</Badge>)}
+                            {userInfo.skills.map((skill) => <Badge color={theme.accentColor} m={8} variant="light">{skill}</Badge>)}
                         </Box>
                     </Stack>
                 </Box>

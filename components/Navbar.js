@@ -1,7 +1,31 @@
-import { Flex, Group, Anchor, Space, Text, Button, Menu } from "@mantine/core"
-
+import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar } from "@mantine/core"
+import { useEffect, useState } from "react";
+import { auth } from "../firebase";
 
 export default function Navbar() {
+
+    let [user, setUser] = useState(null);
+    let [avatar, setAvatar] = useState('');
+
+    useEffect(() => {
+        setAvatar(user?.photoURL || '');
+    }, [user]);
+
+    useEffect(() => {
+        let getUser = async () => {
+            let userData = await auth.currentUser;
+
+            if (userData == null) {
+                console.log("No user logged in");
+                router.push("/login")
+                return;
+            }
+            console.log(userData);
+            setUser(userData);
+        }
+
+        getUser();
+    }, [])
 
     let theme = {
         background: '#16171b',
@@ -26,16 +50,14 @@ export default function Navbar() {
                 withinPortal
             >
                 <Menu.Target>
-                    <Text>
-                        Account
-                    </Text>
+                    <Avatar src={avatar} size={30} m={0} />
                 </Menu.Target>
                 <Menu.Dropdown>
                     <Menu.Item>
-                        <Anchor href={"/profile"}>Profile</Anchor>
+                        <Anchor href={"/profile"} c={theme.accentColor}>Profile</Anchor>
                     </Menu.Item>
                     <Menu.Item>
-                        <Anchor href={"/account-settings"}>Settings</Anchor>
+                        <Anchor href={"/account-settings"} c={theme.accentColor}>Settings</Anchor>
                     </Menu.Item>
                     <Menu.Item>
                         Log Out
