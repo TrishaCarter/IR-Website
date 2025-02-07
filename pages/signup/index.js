@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
-import { createUserWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, setPersistence, signInWithPopup } from 'firebase/auth';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { loginUser } from '@/handlers';
 import { auth, googleProvider, db } from '../../firebase';
@@ -61,6 +61,7 @@ export default function SignInPage() {
 
     let signupGoogle = async () => {
         try {
+            await setPersistence(auth, 'session');
             let gAuth = await signInWithPopup(auth, googleProvider);
             let uid = gAuth.user.uid;
 
