@@ -69,7 +69,7 @@ export default function AccountSettings() {
     return (
         <>
             <Navbar />
-            <Center style={{ background: theme.background, minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <Center c={theme.primaryTextColor} style={{ background: theme.background, minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                 <Title order={1} mb="md" style={{ color: theme.primaryTextColor, fontSize: '3rem' }}>Account Settings</Title>
                 <Box sx={{ maxWidth: 600, padding: '40px', background: theme.secondaryBackground, borderRadius: '8px', color: theme.primaryTextColor }}>
                     <Center style={{ marginBottom: '30px', flexDirection: 'column' }}>

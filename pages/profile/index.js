@@ -81,7 +81,7 @@ export default function Profile() {
         ]
     }
 
-    return <Flex direction="column" align={"center"} h={"100vh"}>
+    return <Flex direction="column" align={"center"} h={"100vh"} c={theme.primaryTextColor} >
         <Navbar />
         <Grid grow columns={12} w={"100vw"} h={"90vh"} p={"lg"} bg={theme.background}>
             <Grid.Col span={8}>

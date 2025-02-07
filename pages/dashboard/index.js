@@ -25,9 +25,9 @@ export default function DashboardPage() {
 
     useEffect(() => {
         let getUser = async () => {
-            let userData = await auth.currentUser;
+            let userData = auth.currentUser;
+            console.log("Current user: ");
             console.log(userData);
-
 
             if (userData == null) {
                 console.log("No user logged in");
@@ -44,7 +44,7 @@ export default function DashboardPage() {
     return <>
         <Navbar />
         <Flex direction="column" align="center" w="100vw" h="90vh " style={{ backgroundColor: theme.background }} pt={15}>
-            <Title order={1} style={{ marginBottom: 20 }}>Welcome back{user ? `, ${user.displayName}!` : "!"}</Title>
+            <Title order={1} mb={20} c={theme.primaryTextColor}>Welcome back{user ? `, ${user.displayName}!` : "!"}</Title>
             <Grid columns={2} gap={20}>
                 <Grid.Col span={1}>
                     <UserProgress />
@@ -55,6 +55,6 @@ export default function DashboardPage() {
                     <TrendingProblems />
                 </Grid.Col>
             </Grid>
-        </Flex>
+        </Flex >
     </>
 }

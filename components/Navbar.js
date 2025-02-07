@@ -8,21 +8,21 @@ export default function Navbar() {
     let [user, setUser] = useState(null);
     let [avatar, setAvatar] = useState('');
 
-    useEffect(() => {
-        let getUser = async () => {
-            let userData = await auth.currentUser;
+    // useEffect(() => {
+    //     let getUser = async () => {
+    //         let userData = await auth.currentUser;
 
-            if (userData == null) {
-                console.log("No user logged in");
-                router.push("/login")
-                return;
-            }
-            console.log(userData);
-            setUser(userData);
-        }
+    //         if (userData == null) {
+    //             console.log("No user logged in");
+    //             router.push("/login")
+    //             return;
+    //         }
+    //         console.log(userData);
+    //         setUser(userData);
+    //     }
 
-        getUser();
-    }, [])
+    //     getUser();
+    // }, [])
 
     useEffect(() => {
         setAvatar(user?.photoURL || '');
@@ -49,7 +49,7 @@ export default function Navbar() {
     return (
         <Flex justify={"space-between"} align={"center"} w={"100%"} p={"lg"} h={"10vh"} style={{ background: theme.secondaryBackground }}>
             <Group>
-                <Text>Logo</Text>
+                <Text c={theme.primaryTextColor}>Logo</Text>
                 <Space w={"lg"} />
                 <Anchor href={"/dashboard"} style={{ color: theme.accentColor }}>Dashboard</Anchor>
                 <Anchor href={"/problems"} style={{ color: theme.accentColor }}>Problems</Anchor>
