@@ -150,7 +150,7 @@ export default function SignInPage() {
                             }, label: { color: theme.primaryTextColor }
                         }}
                     />
-                    <Text>Password must be atleast 6 characters long</Text>
+                    <Text c={theme.secondaryTextColor}>Password must be atleast 6 characters long</Text>
                 </Stack>
 
                 <br />

@@ -33,7 +33,7 @@ export default function TrendingProblems({ topProblems }) {
                     <Group position="apart" >
                         <Title order={4} style={{ color: "#fff" }}>{index + 1}.</Title>
                         <Card key={index} shadow="xs" padding="sm" style={{ backgroundColor: "#1e1e1e" }} w={"90%"}>
-                            <Text size="sm">{problem.name}</Text>
+                            <Text size="sm" c={theme.primaryTextColor}>{problem.name}</Text>
                             <Badge color={problem.difficulty === "Easy" ? "green" : problem.difficulty === "Medium" ? "orange" : "red"} mt={5}>
                                 {problem.difficulty}
                             </Badge>
