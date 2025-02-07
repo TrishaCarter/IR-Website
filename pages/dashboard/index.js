@@ -9,6 +9,8 @@ import UserProgress from "../../components/dashboard/UserProgress";
 import TrendingProblems from "../../components/dashboard/TrendingProblems";
 import LeaderboardSpot from "../../components/LeaderboardSpot";
 import UserBadges from "../../components/dashboard/UserBadges";
+import { useMantineTheme } from '@mantine/core';
+
 
 
 export default function DashboardPage() {
@@ -21,6 +23,7 @@ export default function DashboardPage() {
         primaryTextColor: '#c9c9c9',
         secondaryTextColor: '#aaaaaa',
         accentColor: '#629C44',
+        whiteTextColor: '#ffffff'
     }
 
     useEffect(() => {
@@ -44,7 +47,9 @@ export default function DashboardPage() {
     return <>
         <Navbar />
         <Flex direction="column" align="center" w="100vw" h="90vh " style={{ backgroundColor: theme.background }} pt={15}>
-            <Title order={1} style={{ marginBottom: 20 }}>Welcome back{user ? `, ${user.displayName}!` : "!"}</Title>
+            <Title order={1} style={{ marginBottom: 20, color: theme.whiteTextColor }}> Welcome back{user ? `, ${user.displayName}!` : "!"}
+</Title>
+
             <Grid columns={2} gap={20}>
                 <Grid.Col span={1}>
                     <UserProgress />

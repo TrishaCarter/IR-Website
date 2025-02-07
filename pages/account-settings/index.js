@@ -11,6 +11,7 @@ const theme = {
     primaryTextColor: '#c9c9c9',
     secondaryTextColor: '#aaaaaa',
     accentColor: '#629C44',
+    whiteTextColor: '#ffffff'
 };
 
 export default function AccountSettings() {
@@ -78,10 +79,10 @@ export default function AccountSettings() {
                             {(props) => <Button {...props} size="md">Upload New Picture</Button>}
                         </FileButton>
                     </Center>
-                    <TextInput label="Username" value={username} onChange={(e) => setUsername(e.target.value)} mb="sm" size="md" />
-                    <TextInput label="Email" value={email} disabled mb="sm" size="md" />
-                    <PasswordInput label="New Password" value={password} onChange={(e) => setPassword(e.target.value)} mb="lg" size="md" />
-                    <Switch label="Dark Mode" checked={darkMode} onChange={(event) => setDarkMode(event.currentTarget.checked)} mb="xl" size="lg" />
+                    <TextInput label="Username" value={username} onChange={(e) => setUsername(e.target.value)} mb="sm" size="md" style={{ color: theme.whiteTextColor }} />
+                    <TextInput label="Email" value={email} disabled mb="sm" size="md" style={{ color: theme.whiteTextColor }}/>
+                    <PasswordInput label="New Password" value={password} onChange={(e) => setPassword(e.target.value)} mb="lg" size="md" style={{ color: theme.whiteTextColor }}/>
+                    <Switch label="Dark Mode" checked={darkMode} onChange={(event) => setDarkMode(event.currentTarget.checked)} mb="xl" size="lg" style={{ color: theme.whiteTextColor }}/>
                     <Group position="apart" mt="xl">
                         <Button onClick={handleUpdateProfile} size="xl">Save Changes</Button>
                         <Button color="red" onClick={handleUpdatePassword} size="xl">Update Password</Button>
