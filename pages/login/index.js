@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Header, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
-import { signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { setPersistence, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider, db } from '../../firebase';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { loginUser } from '@/handlers';
