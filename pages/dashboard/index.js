@@ -25,9 +25,9 @@ export default function DashboardPage() {
 
     useEffect(() => {
         let getUser = async () => {
-            let userData = await auth.currentUser;
+            let userData = auth.currentUser;
+            console.log("Current user: ");
             console.log(userData);
-
 
             if (userData == null) {
                 console.log("No user logged in");

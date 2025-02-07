@@ -8,21 +8,21 @@ export default function Navbar() {
     let [user, setUser] = useState(null);
     let [avatar, setAvatar] = useState('');
 
-    useEffect(() => {
-        let getUser = async () => {
-            let userData = await auth.currentUser;
+    // useEffect(() => {
+    //     let getUser = async () => {
+    //         let userData = await auth.currentUser;
 
-            if (userData == null) {
-                console.log("No user logged in");
-                router.push("/login")
-                return;
-            }
-            console.log(userData);
-            setUser(userData);
-        }
+    //         if (userData == null) {
+    //             console.log("No user logged in");
+    //             router.push("/login")
+    //             return;
+    //         }
+    //         console.log(userData);
+    //         setUser(userData);
+    //     }
 
-        getUser();
-    }, [])
+    //     getUser();
+    // }, [])
 
     useEffect(() => {
         setAvatar(user?.photoURL || '');
