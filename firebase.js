@@ -29,15 +29,6 @@ const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 export const auth = getAuth();
 export const db = getFirestore(app, "ir-website-db");
 
-// 🔹 Set Session Persistence
-setPersistence(auth, browserSessionPersistence)
-    .then(() => {
-        console.log("Session persistence set to session.");
-    })
-    .catch((error) => {
-        console.error("Error setting session persistence:", error);
-    });
-
 export const googleProvider = new GoogleAuthProvider();
 
 export let createUserDoc = async (uid, data) => {
