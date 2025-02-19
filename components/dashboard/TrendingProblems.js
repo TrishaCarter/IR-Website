@@ -30,7 +30,7 @@ export default function TrendingProblems({ topProblems }) {
 
             <Stack mt="md">
                 {problems.map((problem, index) => (
-                    <Group position="apart" >
+                    <Group position="apart" key={index}>
                         <Title order={4} style={{ color: "#fff" }}>{index + 1}.</Title>
                         <Card key={index} shadow="xs" padding="sm" style={{ backgroundColor: "#1e1e1e" }} w={"90%"}>
                             <Text size="sm" c={theme.primaryTextColor}>{problem.name}</Text>
