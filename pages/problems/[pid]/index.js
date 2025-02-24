@@ -10,7 +10,17 @@ import { Editor } from "@monaco-editor/react";
 export default function ProblemPage() {
     let router = useRouter()
     let { pid } = router.query
-    const [code, setCode] = useState("");
+
+    let defaultCode = `#include <stdio.h>
+
+int main() {
+
+    /* Write your code here */
+
+    return 0;
+}
+`
+    const [code, setCode] = useState(defaultCode);
     const onCodeChange = useCallback((value) => {
         setCode(value);
     }, []);
