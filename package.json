@@ -21,10 +21,17 @@
     "storybook:build": "storybook build"
   },
   "dependencies": {
+    "@codemirror/lang-cpp": "^6.0.2",
+    "@codemirror/lang-javascript": "^6.2.3",
+    "@codemirror/lang-python": "^6.1.7",
     "@mantine/core": "7.15.1",
     "@mantine/hooks": "7.15.1",
+    "@monaco-editor/react": "^4.7.0",
     "@next/bundle-analyzer": "^14.2.4",
     "@tabler/icons-react": "^3.26.0",
+    "@uiw/codemirror-extensions-langs": "^4.23.8",
+    "@uiw/codemirror-theme-dracula": "^4.23.8",
+    "@uiw/react-codemirror": "^4.23.8",
     "dotenv": "^16.4.7",
     "firebase": "^11.1.0",
     "jsonwebtoken": "^9.0.2",
