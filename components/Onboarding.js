@@ -12,10 +12,18 @@ export default function OnboardingModals({ onComplete }) {
     // Move to next modal
     const nextStep = () => setStep(step + 1);
 
+    let theme = {
+        background: '#16171b',
+        secondaryBackground: '#262729',
+        primaryTextColor: '#c9c9c9',
+        secondaryTextColor: '#aaaaaa',
+        accentColor: '#629C44',
+    }
+
     return (
         <>
             {/* Step 1: Username */}
-            <Modal opened={step === 1} onClose={() => { }} centered>
+            <Modal opened={step === 1} onClose={() => { }} centered bg={theme.background}>
                 <Title order={3}>Choose a Username</Title>
                 <TextInput
                     placeholder="Enter your username"

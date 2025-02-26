@@ -59,7 +59,7 @@ int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
             style={{ backgroundColor: theme.background, color: theme.primaryTextColor }}
         >
             <Box w={"96vw"} mh={70} mx={0} p={"md"} mb={10} style={{ border: `1px solid ${theme.accentColor}` }}>
-                <Title order={2} c={theme.primaryTextColor}>{pInfo.title}</Title>
+                <Title order={2} c={theme.primaryTextColor}>{pInfo.title} - {pid}</Title>
                 <Text c={theme.secondaryTextColor}>By: {pInfo.author}</Text>
             </Box>
             <Flex w={"96vw"} justify={"space-between"} p={0} m={0}>

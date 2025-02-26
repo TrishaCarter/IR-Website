@@ -40,9 +40,9 @@ export default function LandingPage() {
                 </Group>
             </Container>
 
-            <Flex w={"100vw"} justify={"center"}>
+            {/* <Flex w={"100vw"} justify={"center"}>
                 <Button onClick={callContainer}>Call Container</Button>
-            </Flex>
+            </Flex> */}
 
             {/* Features Section */}
             <Container size="lg" mb="60px">
