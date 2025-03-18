@@ -1,7 +1,13 @@
 import { getApps, initializeApp } from "firebase/app";
-import { browserSessionPersistence, getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore"
-
+import {
+    browserSessionPersistence, getAuth,
+    GoogleAuthProvider, setPersistence,
+} from "firebase/auth";
+import {
+    getFirestore, doc,
+    getDoc, setDoc,
+    collection
+} from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -20,17 +26,10 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
-export const db = getFirestore(app, "ir-website-db")
+export const auth = getAuth();
+export const db = getFirestore(app, "ir-website-db");
 
-// Set persistence (should be called after auth initialization)
-if (typeof window !== 'undefined') {
-    // Only run on client side
-    auth.setPersistence(browserSessionPersistence)
-        .catch((error) => {
-            console.error("Auth persistence error:", error);
-        });
-}
+export const googleProvider = new GoogleAuthProvider();
 
 export let createUserDoc = async (uid, data) => {
     try {
@@ -53,5 +52,5 @@ export let getUserDoc = async (uid) => {
     }
 }
 
-export const googleProvider = new GoogleAuthProvider();
+
 export default app;

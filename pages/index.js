@@ -1,4 +1,4 @@
-import { Container, Title, Text, Button, SimpleGrid, Box, ThemeIcon, Group } from "@mantine/core";
+import { Container, Title, Text, Button, SimpleGrid, Box, ThemeIcon, Group, Flex } from "@mantine/core";
 import { IconCheck, IconArrowRight } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 
@@ -9,6 +9,15 @@ export default function LandingPage() {
     }
     let moveToSignUp = () => {
         router.push("/signup")
+    }
+
+    let callContainer = () => {
+        fetch("http://localhost:1738/run", {
+            method: "POST",
+        })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error("Error:", error));
     }
 
     return (
@@ -30,6 +39,10 @@ export default function LandingPage() {
                     </Button>
                 </Group>
             </Container>
+
+            {/* <Flex w={"100vw"} justify={"center"}>
+                <Button onClick={callContainer}>Call Container</Button>
+            </Flex> */}
 
             {/* Features Section */}
             <Container size="lg" mb="60px">
