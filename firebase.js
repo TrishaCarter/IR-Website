@@ -6,7 +6,7 @@ import {
 import {
     getFirestore, doc,
     getDoc, setDoc,
-    collection
+    collection, getDocs
 } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -52,5 +52,19 @@ export let getUserDoc = async (uid) => {
     }
 }
 
+export let getAllProblems = async () => {
+    let problems = [];
+    let problemsRef = collection(db, 'PROBLEMS');
+    try {
+        const querySnapshot = await getDocs(problemsRef);
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return data;
+    } catch (error) {
+        console.error("Error fetching documents: ", error);
+        return [];
+    }
+
+    return problems;
+}
 
 export default app;
