@@ -6,7 +6,8 @@ import {
 import {
     getFirestore, doc,
     getDoc, setDoc,
-    collection, getDocs
+    collection, getDocs,
+    addDoc
 } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -63,8 +64,16 @@ export let getAllProblems = async () => {
         console.error("Error fetching documents: ", error);
         return [];
     }
+}
 
-    return problems;
+export let createProblem = async (data) => {
+    try {
+        let docRef = await addDoc(collection(db, 'PROBLEMS'), data);
+        console.log(`Problem \"${data.title}\" create with ID ${docRef.id}`);
+
+    } catch (error) {
+        console.error('Error creating problem: ', error);
+    }
 }
 
 export default app;
