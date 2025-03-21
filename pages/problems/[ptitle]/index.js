@@ -2,14 +2,13 @@ import { Title, Text, Box, Flex, Grid, Button, Select, Textarea, RemoveScroll, N
 import { useRouter } from "next/router"
 import Navbar from "../../../components/Navbar"
 import { useCallback, useEffect, useState } from "react";
-// import CodeMirror from "@uiw/react-codemirror"
-// import { langs } from "@uiw/codemirror-extensions-langs"
-// import { dracula } from "@uiw/codemirror-theme-dracula";
+import { getProblem, getProblemBySlug } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
 
 export default function ProblemPage() {
     let router = useRouter()
     let { ptitle } = router.query
+    const [prob, setProblem] = useState({});
     const [code, setCode] = useState("");
 
     const onCodeChange = useCallback((value) => {
@@ -21,7 +20,11 @@ export default function ProblemPage() {
     }
 
     useEffect(() => {
-
+        getProblemBySlug(ptitle).then((prob) => {
+            console.log(prob);
+            setProblem(prob);
+            setCode(prob.defaultCode);
+        })
     }, [])
 
     let theme = {
@@ -38,18 +41,18 @@ export default function ProblemPage() {
             style={{ backgroundColor: theme.background, color: theme.primaryTextColor }}
         >
             <Box w={"96vw"} mh={70} mx={0} p={"md"} mb={10} style={{ border: `1px solid ${theme.accentColor}` }}>
-                <Title order={2} c={theme.primaryTextColor}>{pInfo.title} - {pid}</Title>
-                <Text c={theme.secondaryTextColor}>By: {pInfo.author}</Text>
+                <Title order={2} c={theme.primaryTextColor}>{prob.title}</Title>
+                <Text c={theme.secondaryTextColor}>By: {prob.author}</Text>
             </Box>
             <Flex w={"96vw"} justify={"space-between"} p={0} m={0}>
                 <Box w={"40%"} h={"70vh"} mr={10} style={{ border: `1px solid ${theme.accentColor}` }} pt={10} px={"md"}>
                     <Title order={2} c={theme.primaryTextColor}>Description</Title>
-                    <Text c={theme.secondaryTextColor}>{pInfo.description}</Text>
+                    <Text c={theme.secondaryTextColor}>{prob.description}</Text>
 
                     <Divider my={10} />
 
                     <Title order={3} c={theme.primaryTextColor}>Examples</Title>
-                    {pInfo.examples.map((example, index) => {
+                    {/* {prob.examples.map((example, index) => {
                         return <Box key={index} p={10} my={10}>
                             <Title order={4}>Example {index + 1}</Title>
                             <Text c={theme.secondaryTextColor}>Input: {example.input}</Text>
@@ -62,10 +65,10 @@ export default function ProblemPage() {
 
                     <Title order={3} c={theme.primaryTextColor}>Constraints</Title>
                     <List mx={20}>
-                        {pInfo.constraints.map((constraint, index) => {
+                        {prob.constraints.map((constraint, index) => {
                             return <List.Item c={theme.secondaryTextColor}>{constraint}</List.Item>
                         })}
-                    </List>
+                    </List> */}
 
                 </Box>
 

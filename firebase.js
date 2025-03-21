@@ -7,7 +7,7 @@ import {
     getFirestore, doc,
     getDoc, setDoc,
     collection, getDocs,
-    addDoc
+    addDoc, query, where
 } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -65,6 +65,19 @@ export let getAllProblems = async () => {
         return [];
     }
 }
+
+export let getProblemBySlug = async (slug) => {
+    const q = query(collection(db, 'PROBLEMS'), where('slugTitle', '==', slug));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+        return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+    } else {
+        console.log(`Problem ${slug} not found`);
+
+        return null; // not found
+    }
+};
 
 export let createProblem = async (data) => {
     try {
