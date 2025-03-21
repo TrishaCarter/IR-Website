@@ -1,7 +1,7 @@
 import { Title, Text, Box, Flex, Grid, Button, Select, Textarea, RemoveScroll, NativeSelect, Divider, List } from "@mantine/core"
 import { useRouter } from "next/router"
 import Navbar from "../../../components/Navbar"
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 // import CodeMirror from "@uiw/react-codemirror"
 // import { langs } from "@uiw/codemirror-extensions-langs"
 // import { dracula } from "@uiw/codemirror-theme-dracula";
@@ -9,34 +9,9 @@ import { Editor } from "@monaco-editor/react";
 
 export default function ProblemPage() {
     let router = useRouter()
-    let { pid } = router.query
+    let { ptitle } = router.query
+    const [code, setCode] = useState("");
 
-    let pInfo = {
-        title: "Two Sum",
-        author: "LeetCode Development Team",
-        description: `Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.\nYou may assume that each input would have exactly one solution, and you may not use the same element twice.\nYou can return the answer in any order.`,
-        examples: [
-            {
-                input: "nums=[2,7,11,15], target=9",
-                output: "[0,1]",
-                explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]"
-            }
-        ],
-        constraints: [
-            "2 <= nums.length <= 10^4",
-            "-10^9 <= nums[i] <= 10^9",
-            "-10^9 <= target <= 10^9",
-            "Only one valid answer exists"
-        ],
-        defaultCode: `/**
- * Note: The returned array must be malloced, assume caller calls free().
- */
-int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
-    
-}
-        `
-    }
-    const [code, setCode] = useState(pInfo.defaultCode);
     const onCodeChange = useCallback((value) => {
         setCode(value);
     }, []);
@@ -44,6 +19,10 @@ int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
     const printCode = () => {
         console.log(code);
     }
+
+    useEffect(() => {
+
+    }, [])
 
     let theme = {
         background: '#16171b',
