@@ -45,30 +45,32 @@ export default function ProblemPage() {
                 <Text c={theme.secondaryTextColor}>By: {prob.author}</Text>
             </Box>
             <Flex w={"96vw"} justify={"space-between"} p={0} m={0}>
-                <Box w={"40%"} h={"70vh"} mr={10} style={{ border: `1px solid ${theme.accentColor}` }} pt={10} px={"md"}>
+                <Box w={"40%"} h={"70vh"} mr={10} style={{ border: `1px solid ${theme.accentColor}` }} pt={10} px={"md"} >
                     <Title order={2} c={theme.primaryTextColor}>Description</Title>
                     <Text c={theme.secondaryTextColor}>{prob.description}</Text>
 
                     <Divider my={10} />
 
                     <Title order={3} c={theme.primaryTextColor}>Examples</Title>
-                    {/* {prob.examples.map((example, index) => {
-                        return <Box key={index} p={10} my={10}>
-                            <Title order={4}>Example {index + 1}</Title>
-                            <Text c={theme.secondaryTextColor}>Input: {example.input}</Text>
-                            <Text c={theme.secondaryTextColor}>Output: {example.output}</Text>
-                            <Text c={theme.secondaryTextColor}>Explanation: {example.explanation}</Text>
-                        </Box>
-                    })}
+                    <List mx={20}>
+                        {prob.examples && prob.examples.map((example, index) => {
+                            return <Box key={index} my={10}>
+                                <Text c={theme.secondaryTextColor}> {index + 1}. {example}</Text>
+                            </Box>
+                        })}
+                    </List>
+
 
                     <Divider my={10} />
 
                     <Title order={3} c={theme.primaryTextColor}>Constraints</Title>
                     <List mx={20}>
-                        {prob.constraints.map((constraint, index) => {
-                            return <List.Item c={theme.secondaryTextColor}>{constraint}</List.Item>
+                        {prob.constraints && prob.constraints.map((constraint, index) => {
+                            return <Box key={index} my={10}>
+                                <Text c={theme.secondaryTextColor}> {index + 1}. {constraint}</Text>
+                            </Box>
                         })}
-                    </List> */}
+                    </List>
 
                 </Box>
 

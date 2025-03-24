@@ -89,4 +89,30 @@ export let createProblem = async (data) => {
     }
 }
 
+export let trackSolution = async (uid, problemId, data) => {
+
+    // Check if solution for uid/problemID combo exists
+    const q = query(collection(db, `SOLUTIONS`), where('problemId', '==', problemId), where('uid', '==', uid));
+    const snapshot = await getDocs(q);
+
+    // If solution instance exists, update it
+    if (!snapshot.empty) {
+        snapshot.forEach(async (doc) => {
+            await setDoc(doc.ref, data, { merge: true });
+            console.log(`Solution for problem ${problemId} updated for user ${uid}`);
+        });
+
+        return;
+    } else {
+        // If solution instance does not exist, create it
+        try {
+            let docRef = await addDoc(collection(db, "SOLUTIONS"), data);
+            console.log(`Solution for problem ${problemId} tracked with ID ${docRef.id}`);
+
+        } catch (error) {
+            console.error('Error tracking solution: ', error);
+        }
+    }
+}
+
 export default app;
