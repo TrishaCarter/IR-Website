@@ -1,0 +1,27 @@
+# Use an official Python runtime as a parent image
+FROM alpine:latest
+
+# Install necessary packages
+RUN apk update && apk add --no-cache git build-base curl tar
+
+# Set github CLI version for downloading
+ENV GH_VERSION=2.14.0
+
+# Github CLI binary download
+RUN curl -sSL https://github.com/cli/cli/releases/download/v${GH_VERSION}/gh_${GH_VERSION}_linux_amd64.tar.gz \
+    | tar -xz -C /usr/local/bin --strip-components=1 gh_${GH_VERSION}_linux_amd64/bin/gh
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the current directory contents into the container at /app
+COPY . /app
+
+# Install any dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Expose port 5000 for the API
+EXPOSE 1738
+
+# Run the application. It first pulls the Optimizinator and then runs the API
+CMD ["python", "app.py"]
