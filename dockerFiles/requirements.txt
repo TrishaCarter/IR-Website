@@ -1,4 +1,5 @@
 flask
 requests
 flask_cors
-gitpython
+GitPython
+gunicorn
