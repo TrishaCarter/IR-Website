@@ -3,9 +3,12 @@ import { getAllProblems } from "@/firebase"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import Navbar from "../../components/Navbar";
+import { auth, getUserSolutions } from "../../firebase";
 
 export default function ProblemHomepage() {
     let [problems, setProblems] = useState([]);
+    let [solutions, setSolutions] = useState([]);
+    let [unsolved, setUnsolved] = useState([]);
     let [search, setSearch] = useState('');
 
     let theme = {
@@ -17,12 +20,36 @@ export default function ProblemHomepage() {
     }
 
     useEffect(() => {
+        // Used to create unsolved array later
+        let probArr, solArr, unsolvedArr = [];
         getAllProblems().then((problems) => {
+            probArr = problems;
+            console.log(probArr);
+
             setProblems(problems)
             console.log(problems);
 
+            let userId = auth.currentUser.uid;
+            getUserSolutions(userId).then((solutions) => {
+                solArr = solutions;
+                setSolutions(solutions);
+                console.log(solutions);
+            })
         })
+
+        // Create an array of unsolved problems
+        probArr = problems.map(p => p.id);
+        console.log("Problem arr:", probArr);
+        solArr = solutions.map(s => s.problemId);
+        console.log("Solution arr:", solArr);
+
+        unsolvedArr = probArr.filter(p => !solArr.includes(p));
+        console.log("Unsolved problems:");
+        console.log(unsolvedArr);
+        setUnsolved(unsolvedArr);
+
     }, [])
+
 
     const filtered = problems.filter((p) =>
         p.title.toLowerCase().includes(search.toLowerCase())

@@ -115,4 +115,16 @@ export let trackSolution = async (uid, problemId, data) => {
     }
 }
 
+export let getUserSolutions = async (uid) => {
+    const q = query(collection(db, 'SOLUTIONS'), where('uid', '==', uid));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } else {
+        console.log(`No solutions found for user ${uid}`);
+        return [];
+    }
+}
+
 export default app;

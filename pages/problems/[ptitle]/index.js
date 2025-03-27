@@ -2,7 +2,7 @@ import { Title, Text, Box, Flex, Grid, Button, Select, Textarea, RemoveScroll, N
 import { useRouter } from "next/router"
 import Navbar from "../../../components/Navbar"
 import { useCallback, useEffect, useState } from "react";
-import { getProblem, getProblemBySlug } from "../../../firebase";
+import { auth, getProblemBySlug } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
 
 export default function ProblemPage() {
@@ -15,8 +15,21 @@ export default function ProblemPage() {
         setCode(value);
     }, []);
 
-    const printCode = () => {
+    const checkSolution = () => {
         console.log(code);
+        fetch("http://localhost:1738/check", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: {
+                code: code,
+                user: auth.currentUser.uid
+            }
+        }).then((res) => {
+            console.log(res)
+        }).catch(err => console.error(err));
+
     }
 
     useEffect(() => {
@@ -80,7 +93,7 @@ export default function ProblemPage() {
                     </Flex>
                     <Editor height={"80%"} defaultLanguage="c" onChange={onCodeChange} value={code} theme="vs-dark" />
                     <Flex w={"100%"} h={"10%"} p={0} m={0} pr={20} justify={"center"} align={"center"}>
-                        <Button onClick={printCode}>Submit</Button>
+                        <Button onClick={checkSolution}>Submit</Button>
                     </Flex>
                 </Box>
             </Flex>
