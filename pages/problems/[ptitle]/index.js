@@ -22,14 +22,21 @@ export default function ProblemPage() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: {
+            body: JSON.stringify({
                 code: code,
                 user: auth.currentUser.uid
-            }
-        }).then((res) => {
-            console.log(res)
-        }).catch(err => console.error(err));
-
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error ${response.status}: ${response.error}`);
+                }
+                let stuff = response.text();
+                return stuff; // Use .json() if your response is JSON
+            })
+            .then(data => {
+                console.log("Response data:", data);
+            })
     }
 
     useEffect(() => {
