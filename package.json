@@ -22,11 +22,11 @@
     },
     "dependencies": {
         "@mantine/core": "7.15.1",
+        "@mantine/form": "^7.17.2",
         "@mantine/hooks": "7.15.1",
         "@monaco-editor/react": "^4.7.0",
         "@next/bundle-analyzer": "^14.2.4",
         "@tabler/icons-react": "^3.26.0",
-        "cookie": "^1.0.2",
         "dotenv": "^16.4.7",
         "firebase": "^11.1.0",
         "jsonwebtoken": "^9.0.2",
@@ -67,5 +67,5 @@
         "typescript": "5.5.2",
         "typescript-eslint": "^8.14.0"
     },
-    "packageManager": "yarn@1.22.19"
+    "packageManager": "yarn@4.5.3"
 }
