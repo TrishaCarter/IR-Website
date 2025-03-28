@@ -3,10 +3,15 @@ import { getAllProblems } from "@/firebase"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import Navbar from "../../components/Navbar";
+import { auth, getUserSolutions } from "../../firebase";
 
 export default function ProblemHomepage() {
-    let [problems, setProblems] = useState([]);
-    let [search, setSearch] = useState('');
+    const [problems, setProblems] = useState([]);
+    const [solutions, setSolutions] = useState([]);
+    const [inProgress, setInProgress] = useState([]);
+    const [unsolved, setUnsolved] = useState([]);
+    const [finished, setFinished] = useState([]);
+    const [search, setSearch] = useState('');
 
     let theme = {
         background: '#16171b',
@@ -17,14 +22,49 @@ export default function ProblemHomepage() {
     }
 
     useEffect(() => {
-        getAllProblems().then((problems) => {
-            setProblems(problems)
-            console.log(problems);
+        const userId = auth.currentUser.uid;
+        // Wait for both promises to resolve before trying to filter. 
+        // A problem came up where both states were not updating in a proper time to filter correctly.
+        Promise.all([getAllProblems(), getUserSolutions(userId)])
+            .then(([allProblems, userSolutions]) => {
+                setProblems(allProblems);
+                setSolutions(userSolutions);
 
-        })
-    }, [])
+                // Problems with a solution that is not finished (In-Progress)
+                const inProgressArr = allProblems.filter(problem =>
+                    userSolutions.some(solution => solution.probid === problem.id && solution.finished === false)
+                );
 
-    const filtered = problems.filter((p) =>
+                // Problems with no solution (Unsolved)
+                const unsolvedArr = allProblems.filter(problem =>
+                    !userSolutions.some(solution => solution.probid === problem.id)
+                );
+
+                // Problems with a finished solution (Finished)
+                const finishedArr = allProblems.filter(problem =>
+                    userSolutions.some(solution => solution.probid === problem.id && solution.finished === true)
+                );
+
+                setInProgress(inProgressArr);
+                setUnsolved(unsolvedArr);
+                setFinished(finishedArr);
+
+                console.log("In-Progress", inProgressArr);
+                console.log("Unsolved", unsolvedArr);
+                console.log("Finished", finishedArr);
+            })
+            .catch(err => console.error(err));
+    }, []);
+
+
+    // Filter each group by the search term
+    const filteredInProgress = inProgress.filter(p =>
+        p.title.toLowerCase().includes(search.toLowerCase())
+    );
+    const filteredUnsolved = unsolved.filter(p =>
+        p.title.toLowerCase().includes(search.toLowerCase())
+    );
+    const filteredFinished = finished.filter(p =>
         p.title.toLowerCase().includes(search.toLowerCase())
     );
 
@@ -39,7 +79,42 @@ export default function ProblemHomepage() {
         );
     };
 
-    return <Flex w={"100vw"} h={"100vh"} m={0} direction={"column"} align={"center"}
+    // Helper to render a grid of problem cards
+    const renderGrid = (problemsGroup) => (
+        <Grid gutter="lg">
+            {problemsGroup.map(problem => (
+                <Grid.Col span={{ base: 12, sm: 6, md: 4 }} key={problem.id}>
+                    <Card shadow="sm" padding="lg" radius="md" withBorder bg={theme.secondaryBackground} c={theme.accentColor} h={250}>
+                        <Stack>
+                            <Group justify="space-between" h={50}>
+                                <Text fw={700}>{problem.title}</Text>
+                                <Text size="sm" c="dimmed">
+                                    {problem.author}
+                                </Text>
+                            </Group>
+                            <Text size="sm" c="gray" h={65}>
+                                {problem.description?.slice(0, 215)}
+                                {problem.description?.length > 215 ? "..." : ""}
+                            </Text>
+                            <Button
+                                h={40}
+                                component={Link}
+                                href={`/problems/${slugify(problem.title)}`}
+                                variant="light"
+                                color="blue"
+                                fullWidth
+                                mt="md"
+                            >
+                                Solve
+                            </Button>
+                        </Stack>
+                    </Card>
+                </Grid.Col>
+            ))}
+        </Grid>
+    );
+
+    return <Flex w={"100vw"} mh={"100vh"} m={0} direction={"column"} align={"center"}
         style={{ backgroundColor: theme.background, color: theme.primaryTextColor }}
     >
         <Navbar />
@@ -56,38 +131,29 @@ export default function ProblemHomepage() {
                 mb="lg"
             />
 
-            <Grid gutter="lg">
-                {filtered.map((problem) => (
-                    <Grid.Col span={{ base: 12, sm: 6, md: 4 }} key={problem.id}>
-                        <Card shadow="sm" padding="lg" radius="md" withBorder bg={theme.secondaryBackground} c={theme.accentColor} h={250}>
-                            <Stack>
-                                <Group justify="space-between" h={50}>
-                                    <Text fw={700}>{problem.title}</Text>
-                                    <Text size="sm" c="dimmed">
-                                        {problem.author}
-                                    </Text>
-                                </Group>
-                                <Text size="sm" c="gray" h={65}>
-                                    {problem.description?.slice(0, 215)}
-                                    {problem.description?.length > 215 ? "..." : ""}
-                                </Text>
+            {/* In-Progress Problems */}
+            {filteredInProgress.length > 0 && (
+                <>
+                    <Title order={3} mb="md" ta="center">In-Progress</Title>
+                    {renderGrid(filteredInProgress, "Continue")}
+                </>
+            )}
 
-                                <Button
-                                    h={40}
-                                    component={Link}
-                                    href={`/problems/${slugify(problem.title)}`}
-                                    variant="light"
-                                    color="blue"
-                                    fullWidth
-                                    mt="md"
-                                >
-                                    Solve
-                                </Button>
-                            </Stack>
-                        </Card>
-                    </Grid.Col>
-                ))}
-            </Grid>
+            {/* Unsolved Problems */}
+            {filteredUnsolved.length > 0 && (
+                <>
+                    <Title order={3} mb="md" ta="center" mt="xl">Unsolved</Title>
+                    {renderGrid(filteredUnsolved, "Solve")}
+                </>
+            )}
+
+            {/* Finished Problems */}
+            {filteredFinished.length > 0 && (
+                <>
+                    <Title order={3} mb="md" ta="center" mt="xl">Finished</Title>
+                    {renderGrid(filteredFinished, "View")}
+                </>
+            )}
 
         </Container>
     </Flex>

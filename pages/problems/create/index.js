@@ -47,6 +47,7 @@ export default function CreateProblem() {
 
                 let data = {
                     title: title,
+                    slugTitle: title.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-'),
                     author: author,
                     description: description,
                     constraints: constraints,

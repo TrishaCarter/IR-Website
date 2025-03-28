@@ -7,7 +7,7 @@ import {
     getFirestore, doc,
     getDoc, setDoc,
     collection, getDocs,
-    addDoc
+    addDoc, query, where
 } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -66,6 +66,19 @@ export let getAllProblems = async () => {
     }
 }
 
+export let getProblemBySlug = async (slug) => {
+    const q = query(collection(db, 'PROBLEMS'), where('slugTitle', '==', slug));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+        return { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
+    } else {
+        console.log(`Problem ${slug} not found`);
+
+        return null; // not found
+    }
+};
+
 export let createProblem = async (data) => {
     try {
         let docRef = await addDoc(collection(db, 'PROBLEMS'), data);
@@ -73,6 +86,44 @@ export let createProblem = async (data) => {
 
     } catch (error) {
         console.error('Error creating problem: ', error);
+    }
+}
+
+export let trackSolution = async (uid, problemId, data) => {
+
+    // Check if solution for uid/problemID combo exists
+    const q = query(collection(db, `SOLUTIONS`), where('problemId', '==', problemId), where('uid', '==', uid));
+    const snapshot = await getDocs(q);
+
+    // If solution instance exists, update it
+    if (!snapshot.empty) {
+        snapshot.forEach(async (doc) => {
+            await setDoc(doc.ref, data, { merge: true });
+            console.log(`Solution for problem ${problemId} updated for user ${uid}`);
+        });
+
+        return;
+    } else {
+        // If solution instance does not exist, create it
+        try {
+            let docRef = await addDoc(collection(db, "SOLUTIONS"), data);
+            console.log(`Solution for problem ${problemId} tracked with ID ${docRef.id}`);
+
+        } catch (error) {
+            console.error('Error tracking solution: ', error);
+        }
+    }
+}
+
+export let getUserSolutions = async (uid) => {
+    const q = query(collection(db, 'SOLUTIONS'), where('uid', '==', uid));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } else {
+        console.log(`No solutions found for user ${uid}`);
+        return [];
     }
 }
 
