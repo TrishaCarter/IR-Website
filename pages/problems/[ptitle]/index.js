@@ -29,7 +29,9 @@ export default function ProblemPage() {
         })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error(`HTTP error ${response.status}: ${response.error}`);
+                    // throw new Error(`HTTP error ${response.status}: ${response.error}`);
+                    console.log(response);
+
                 }
                 let stuff = response.text();
                 return stuff; // Use .json() if your response is JSON
