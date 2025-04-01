@@ -20,18 +20,14 @@ def check():
         with open(os.path.join(repo_path, "testing.c"), "w") as f:
             f.write(data["code"])
 
-        print(data["code"])
 
-        # output = subprocess.check_output(["python3", "c_preprocess.py", "testing.c", '{"#1": "$1"}', "c.rbe", "1", "to>&1"], cwd=repo_path, universal_newlines=True)
-        output = subprocess.Popen(["python3", "c_preprocess.py", "testing.c", '{"#1": "$1"}', "c.rbe", "1"], cwd=repo_path, universal_newlines=True, stderr=subprocess.STDOUT)
+        proc = subprocess.Popen(["python3", "c_preprocess.py", "testing.c", '{"#1": "$1"}', "c.rbe", "1"], cwd=repo_path, universal_newlines=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE)
+        out, err = proc.communicate()
 
+        print(out)
 
-        print(os.listdir(repo_path))
-
-        print("here 2")
-        return jsonify({"output": "Process complete"}), 200
+        return jsonify({"output": out}), 200
     except subprocess.CalledProcessError as e:
-        print("here 1")
         return jsonify({"error": str(e)}), 200
 
 if __name__ == '__main__':
