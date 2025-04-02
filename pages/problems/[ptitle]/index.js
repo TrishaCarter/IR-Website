@@ -24,7 +24,8 @@ export default function ProblemPage() {
             },
             body: JSON.stringify({
                 code: code,
-                user: auth.currentUser.uid
+                user: auth.currentUser.uid,
+                cuda: false
             })
         })
             .then(response => {
