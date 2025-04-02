@@ -10,6 +10,7 @@ export default function ProblemPage() {
     let { ptitle } = router.query
     const [prob, setProblem] = useState({});
     const [code, setCode] = useState("");
+    const [probID, setProbID] = useState(0);
 
     const onCodeChange = useCallback((value) => {
         setCode(value);
@@ -25,7 +26,8 @@ export default function ProblemPage() {
             body: JSON.stringify({
                 code: code,
                 user: auth.currentUser.uid,
-                cuda: false
+                cuda: false,
+                probID: probID
             })
         })
             .then(response => {
@@ -46,6 +48,7 @@ export default function ProblemPage() {
         getProblemBySlug(ptitle).then((prob) => {
             console.log(prob);
             setProblem(prob);
+            setProbID(prob.probID);
             setCode(prob.defaultCode);
         })
     }, [])
