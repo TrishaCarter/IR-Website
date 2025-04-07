@@ -1,5 +1,5 @@
 flask
 requests
-flask_cors
+Flask-Cors==3.0.8
 GitPython
 gunicorn
