@@ -27,6 +27,7 @@
         "@monaco-editor/react": "^4.7.0",
         "@next/bundle-analyzer": "^14.2.4",
         "@tabler/icons-react": "^3.26.0",
+        "cookie": "^1.0.2",
         "dotenv": "^16.4.7",
         "firebase": "^11.1.0",
         "jsonwebtoken": "^9.0.2",
