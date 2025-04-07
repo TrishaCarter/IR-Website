@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { TextInput, Textarea, Button, Group, Title, Flex, Container, ScrollArea, Space, Text } from '@mantine/core';
+import { TextInput, Textarea, Button, Group, Title, Flex, Container, ScrollArea, Space, Text, Divider } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { ActionIcon } from '@mantine/core';
 import Navbar from '../../../components/Navbar';
@@ -12,7 +12,14 @@ export default function CreateProblem() {
     const [author, setAuthor] = useState('Refactr Dev Team');
     const [description, setDescription] = useState('');
     const [constraints, setConstraints] = useState([""]);
-    const [examples, setExamples] = useState([""]);
+    // Examples now is an array of objects with { inputs, output }.
+    // Each inputs is an array of objects with { name, value }.
+    const [examples, setExamples] = useState([
+        {
+            inputs: constraints.map(constraint => ({ name: constraint, value: "" })),
+            output: ""
+        }
+    ]);
     const [defaultCode, setDefaultCode] = useState("/** * Note: The returned array must be malloced, assume caller calls free(). */\nint* twoSum(int* nums, int numsSize, int target, int* returnSize) { \n\n} ");
 
     const [titleErr, setTitleErr] = useState(false);
@@ -61,7 +68,7 @@ export default function CreateProblem() {
                 setAuthor('');
                 setDescription('');
                 setConstraints([""]);
-                setExamples([""]);
+                setExamples([{}]);
                 setDefaultCode("/** * Note: The returned array must be malloced, assume caller calls free(). */\nint* twoSum(int* nums, int numsSize, int target, int* returnSize) { \n\n} ");
                 setTitleErr(false);
                 setAuthorErr(false);
@@ -75,6 +82,20 @@ export default function CreateProblem() {
         }
 
     }
+
+    // Whenever constraints change, update each example's inputs to ensure they match.
+    useEffect(() => {
+        setExamples(prevExamples =>
+            prevExamples.map(example => {
+                const newInputs = constraints.map(constraint => {
+                    // Try to preserve any existing value for this constraint.
+                    const existing = example.inputs.find(inp => inp.name === constraint);
+                    return existing ? existing : { name: constraint, value: "" };
+                });
+                return { ...example, inputs: newInputs };
+            })
+        );
+    }, [constraints]);
 
     return <Flex
         w={"100vw"} mah={"100vh"} m={0} direction={"column"} align={"center"}
@@ -118,12 +139,12 @@ export default function CreateProblem() {
                     w={"50vw"}
                 />
                 <Text>Constraints</Text>
-                {constraintsErr && <Text c="red">Must have atleast 1 constraint</Text>}
-                {constraints.map((_, index) => (
+                {constraintsErr && <Text color="red">Must have at least 1 constraint</Text>}
+                {constraints.map((constraint, index) => (
                     <Group key={index} mt="xs">
                         <TextInput
                             placeholder={`Constraint ${index + 1}`}
-                            value={constraints[index]}
+                            value={constraint}
                             onChange={(e) => {
                                 let newConstraints = [...constraints];
                                 newConstraints[index] = e.target.value;
@@ -135,52 +156,65 @@ export default function CreateProblem() {
                             color="red"
                             variant="outline"
                             onClick={() => setConstraints(constraints.filter((_, i) => i !== index))}
-                            disabled={constraints.length === 1} // Prevent removing the last one
+                            disabled={constraints.length === 1}
                         >
                             <IconTrash size={18} />
                         </ActionIcon>
                     </Group>
                 ))}
-
-                <Button
-                    variant="light"
-                    mt="md"
-                    onClick={() => setConstraints([...constraints, ""])}
-                >
+                <Button variant="light" mt="md" mb={"md"} onClick={() => setConstraints([...constraints, ""])}>
                     Add Constraint
                 </Button>
 
-                <Text mt={20}>Examples</Text>
-                {examplesErr && <Text c="red">Must have atleast 1 example</Text>}
-                {examples.map((_, index) => (
-                    <Group key={index} mt="xs">
+                {examplesErr && <Text c="red">Each example must have values for all constraints and an output</Text>}
+                {examples.map((example, exIndex) => (
+                    <Group key={exIndex} display={"block"} bd={"1px solid #ccc"} p={"md"} mb={"md"}>
+                        <Title order={4} mt="xs">Example {exIndex + 1}</Title>
+                        {constraints.map((constraint, cIndex) => (
+                            <Group key={cIndex} mt="xs" align="flex-end" ml={"md"} >
+                                <Text size="sm" weight={500} style={{ width: "5vw", textAlign: "center" }}>
+                                    {constraint.toUpperCase()}
+                                </Text>
+                                <Text>:</Text>
+                                <TextInput
+                                    placeholder={`Value for ${constraint}`}
+                                    value={example.inputs.find(inp => inp.name === constraint)?.value || ""}
+                                    onChange={(e) => {
+                                        const newExamples = [...examples];
+                                        newExamples[exIndex].inputs = newExamples[exIndex].inputs.map(inp =>
+                                            inp.name === constraint ? { ...inp, value: e.target.value } : inp
+                                        );
+                                        setExamples(newExamples);
+                                    }}
+                                    style={{ width: "15vw" }}
+                                />
+                            </Group>
+                        ))}
                         <TextInput
-                            placeholder={`Examples ${index + 1}`}
-                            value={examples[index]}
+                            label="Output"
+                            placeholder="Expected output"
+                            value={example.output}
                             onChange={(e) => {
-                                let newExamples = [...examples];
-                                newExamples[index] = e.target.value;
+                                const newExamples = [...examples];
+                                newExamples[exIndex].output = e.target.value;
                                 setExamples(newExamples);
                             }}
                             w={"30vw"}
+                            ml={"md"}
+                            mt="xs"
                         />
-                        <ActionIcon
-                            color="red"
-                            variant="outline"
-                            onClick={() => setExamples(examples.filter((_, i) => i !== index))}
-                            disabled={examples.length === 1} // Prevent removing the last one
+                        <Button
+                            variant="light"
+                            mt="md"
+                            onClick={() => setExamples(examples.filter((_, i) => i !== exIndex))}
+                            disabled={examples.length === 1}
                         >
-                            <IconTrash size={18} />
-                        </ActionIcon>
+                            Remove Example
+                        </Button>
                     </Group>
                 ))}
-
-                <Button
-                    variant="light"
-                    mt="md"
-                    onClick={() => setExamples([...examples, ""])}
-                >
-                    Add Constraint
+                <Button variant="light" mt="md" onClick={() => setExamples([...examples, { inputs: constraints.map(c => ({ name: c, value: "" })), output: "" }])}>
+                    Add Example
                 </Button>
 
                 <Text mt={20}>Default Code</Text>
