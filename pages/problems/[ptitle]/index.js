@@ -26,25 +26,38 @@ export default function ProblemPage() {
 
     const checkSolution = () => {
         console.log(code);
-        fetch("http://localhost:1738/check", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                code: code,
-                user: auth.currentUser?.uid,
-            }),
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    console.log(response);
-                }
-                return response.text();
-            })
-            .then((data) => {
-                console.log("Response data:", data);
-            });
+
+        // 1. Validate code with test cases
+
+        // 1.a If valid, send to server for compilation
+
+        // 2. Send code to server for compilation
+
+        // 2.a If valid, show success message 
+
+        // 2.b If invalid, show error message
+
+        // 1.b If invalid, show error message
+
+        // fetch("http://localhost:1738/check", {
+        //     method: "POST",
+        //     headers: {
+        //         "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({
+        //         code: code,
+        //         user: auth.currentUser?.uid,
+        //     }),
+        // })
+        //     .then((response) => {
+        //         if (!response.ok) {
+        //             console.log(response);
+        //         }
+        //         return response.text();
+        //     })
+        //     .then((data) => {
+        //         console.log("Response data:", data);
+        //     });
     };
 
     useEffect(() => {
@@ -169,7 +182,14 @@ export default function ProblemPage() {
                         <Title order={3} style={{ color: theme.primaryTextColor }}>
                             Constraints
                         </Title>
-                        <Box my={10}>
+                        <Box
+                            my={10}
+                            p={10}
+                            style={{
+                                borderLeft: `1px solid ${theme.accentColor}`,
+                                borderRadius: 4,
+                            }}
+                        >
                             {prob.constraints &&
                                 prob.constraints.map((constraint, index) => (
                                     <Text
