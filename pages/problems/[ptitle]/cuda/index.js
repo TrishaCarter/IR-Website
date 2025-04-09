@@ -95,25 +95,75 @@ int main() {
                     <Divider my={10} />
 
                     <Title order={3} c={theme.primaryTextColor}>Examples</Title>
-                    <List mx={20}>
-                        {prob.examples && prob.examples.map((example, index) => {
-                            return <Box key={index} my={10}>
-                                <Text c={theme.secondaryTextColor}> {index + 1}. {example}</Text>
+                    {prob.examples && prob.examples.map((example, index) => {
+                        // Build a user-friendly input string
+                        const inputString = example.inputs
+                            ?.map((inp) => {
+                                const val = Array.isArray(inp.value)
+                                    ? JSON.stringify(inp.value)
+                                    : inp.value;
+                                return `${inp.name} = ${val}`;
+                            })
+                            .join(", ");
+
+                        const outputString = Array.isArray(example.output)
+                            ? JSON.stringify(example.output)
+                            : example.output;
+
+                        return (
+                            <Box
+                                key={index}
+                                my={10}
+                                p={10}
+                                style={{
+                                    borderLeft: `1px solid ${theme.accentColor}`,
+                                    borderRadius: 4,
+                                }}
+                            >
+                                <Text weight={600} mb={6}>
+                                    Example {index + 1}:
+                                </Text>
+                                <Text style={{ color: theme.secondaryTextColor }}>
+                                    <strong>Input:</strong> {inputString}
+                                </Text>
+                                <Text style={{ color: theme.secondaryTextColor }}>
+                                    <strong>Output:</strong> {outputString}
+                                </Text>
+                                {example.explanation && (
+                                    <Text style={{ color: theme.secondaryTextColor }}>
+                                        <strong>Explanation:</strong> {example.explanation}
+                                    </Text>
+                                )}
                             </Box>
-                        })}
-                    </List>
+                        );
+                    })}
 
 
                     <Divider my={10} />
 
                     <Title order={3} c={theme.primaryTextColor}>Constraints</Title>
-                    <List mx={20}>
-                        {prob.constraints && prob.constraints.map((constraint, index) => {
-                            return <Box key={index} my={10}>
-                                <Text c={theme.secondaryTextColor}> {index + 1}. {constraint}</Text>
-                            </Box>
-                        })}
-                    </List>
+                    <Box
+                        my={10}
+                        p={10}
+                        style={{
+                            borderLeft: `1px solid ${theme.accentColor}`,
+                            borderRadius: 4,
+                        }}
+                    >
+                        {prob.constraints &&
+                            prob.constraints.map((constraint, index) => (
+                                <Text
+                                    key={index}
+                                    style={{
+                                        color: theme.secondaryTextColor,
+                                        marginBottom: 4,
+                                        whiteSpace: "pre-wrap",
+                                    }}
+                                >
+                                    {index + 1}. {constraint}
+                                </Text>
+                            ))}
+                    </Box>
 
                 </Box>
 
