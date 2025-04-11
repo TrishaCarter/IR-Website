@@ -77,9 +77,6 @@ export default function ProblemPage() {
             return false
         }
 
-        console.log("here");
-
-
         // 2 If valid, send to server for compilation
         fetch("http://localhost:1738/check", {
             method: "POST",
