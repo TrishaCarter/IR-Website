@@ -171,7 +171,14 @@ export default function ProblemPage() {
                         <Title order={3} style={{ color: theme.primaryTextColor }}>
                             Constraints
                         </Title>
-                        <Box my={10}>
+                        <Box
+                            my={10}
+                            p={10}
+                            style={{
+                                borderLeft: `1px solid ${theme.accentColor}`,
+                                borderRadius: 4,
+                            }}
+                        >
                             {prob.constraints &&
                                 prob.constraints.map((constraint, index) => (
                                     <Text

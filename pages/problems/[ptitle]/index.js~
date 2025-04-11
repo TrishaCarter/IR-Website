@@ -34,15 +34,10 @@ export default function ProblemPage() {
             },
             body: JSON.stringify({
                 code: code,
-<<<<<<< HEAD
                 user: auth.currentUser.uid,
                 cuda: false,
                 probID: probID
             })
-=======
-                user: auth.currentUser?.uid,
-            }),
->>>>>>> 14f0146 (Quick styling fixes to solution page)
         })
             .then((response) => {
                 if (!response.ok) {
@@ -56,7 +51,6 @@ export default function ProblemPage() {
     };
 
     useEffect(() => {
-<<<<<<< HEAD
         getProblemBySlug(ptitle).then((prob) => {
             console.log(prob);
             setProblem(prob);
@@ -64,16 +58,6 @@ export default function ProblemPage() {
             setCode(prob.defaultCode);
         })
     }, [])
-=======
-        if (ptitle) {
-            getProblemBySlug(ptitle).then((p) => {
-                console.log(p);
-                setProblem(p);
-                setCode(p.defaultCode);
-            });
-        }
-    }, [ptitle]);
->>>>>>> 14f0146 (Quick styling fixes to solution page)
 
     let theme = {
         background: "#16171b",
@@ -187,7 +171,14 @@ export default function ProblemPage() {
                         <Title order={3} style={{ color: theme.primaryTextColor }}>
                             Constraints
                         </Title>
-                        <Box my={10}>
+                        <Box
+                            my={10}
+                            p={10}
+                            style={{
+                                borderLeft: `1px solid ${theme.accentColor}`,
+                                borderRadius: 4,
+                            }}
+                        >
                             {prob.constraints &&
                                 prob.constraints.map((constraint, index) => (
                                     <Text
