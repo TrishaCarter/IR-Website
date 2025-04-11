@@ -1,8 +1,8 @@
 # Stage 1: Build and Setup
-FROM alpine:latest
+FROM ubuntu
 
 # Install build dependencies
-RUN apk update && apk add --no-cache git build-base curl tar python3 py3-pip gcc linux-tools
+RUN apt update && apt install -y git build-essential curl tar python3 python3-pip gcc linux-tools-generic nvidia-cuda-toolkit 
 
 WORKDIR /app
 
