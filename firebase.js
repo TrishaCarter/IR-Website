@@ -127,4 +127,28 @@ export let getUserSolutions = async (uid) => {
     }
 }
 
+export let getProblemSolutions = async (problemId) => {
+    const q = query(collection(db, 'SOLUTIONS'), where('probid', '==', problemId));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } else {
+        console.log(`No solutions found for problem ${problemId}`);
+        return [];
+    }
+}
+
+export let getUserById = async (uid) => {
+    let docRef = doc(db, 'USERS', uid);
+    let docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        return docSnap.data();
+    } else {
+        console.log("No such document!");
+        return null;
+    }
+}
+
 export default app;
