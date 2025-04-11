@@ -20,6 +20,7 @@ export default function ProblemPage() {
     const [code, setCode] = useState("");
     const [passedCases, setPassedCases] = useState([]);
     const [testCasesPassed, setTestCasesPassed] = useState(false);
+    const [probID, setProbID] = useState("");
     const [cpuMetric, setCpuMetric] = useState(0);
     const [gpuMetric, setGpuMetric] = useState(0);
 
