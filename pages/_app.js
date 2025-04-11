@@ -1,11 +1,19 @@
-import '@mantine/core/styles.css';
-
+import '@mantine/notifications/styles.css';
 import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
-import { theme } from '../theme';
 import { useState, useEffect, createContext, useContext } from "react";
 import { auth } from "@/firebase"; // Import auth from your Firebase setup
 import { onAuthStateChanged } from "firebase/auth";
+import { Notifications } from '@mantine/notifications';
+
+
+let theme = {
+    background: "#16171b",
+    secondaryBackground: "#262729",
+    primaryTextColor: "#c9c9c9",
+    secondaryTextColor: "#aaaaaa",
+    accentColor: "#629C44",
+};
 
 export default function App({ Component, pageProps }) {
     return (
@@ -19,6 +27,7 @@ export default function App({ Component, pageProps }) {
                 <link rel="shortcut icon" href="/favicon.svg" />
             </Head>
             <AuthProvider>
+                <Notifications bg={theme.background} />
                 <Component {...pageProps} />
             </AuthProvider>
         </MantineProvider>

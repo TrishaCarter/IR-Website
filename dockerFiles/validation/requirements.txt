@@ -1,0 +1,5 @@
+flask
+requests
+Flask-Cors==3.0.8
+GitPython
+gunicorn

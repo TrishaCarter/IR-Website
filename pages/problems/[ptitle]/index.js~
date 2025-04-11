@@ -1,27 +1,26 @@
-import '@mantine/core/styles.css';
 import {
-    Title, Text, Box, Flex,
-    Button, NativeSelect, Divider,
-    Notification
+    Title,
+    Text,
+    Box,
+    Flex,
+    Button,
+    NativeSelect,
+    Divider
 } from "@mantine/core";
 import { RemoveScroll } from "react-remove-scroll";
 import { useRouter } from "next/router";
 import Navbar from "../../../components/Navbar";
 import { useCallback, useEffect, useState } from "react";
-import { auth, getProblemBySlug, trackSolution } from "../../../firebase";
+import { auth, getProblemBySlug } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
-import { notifications } from '@mantine/notifications';
 
 export default function ProblemPage() {
     let router = useRouter();
     let { ptitle } = router.query;
-    let uid = auth.currentUser?.uid;
     const [prob, setProblem] = useState({});
     const [code, setCode] = useState("");
     const [passedCases, setPassedCases] = useState([]);
     const [testCasesPassed, setTestCasesPassed] = useState(false);
-    const [cpuMetric, setCpuMetric] = useState(0);
-    const [gpuMetric, setGpuMetric] = useState(0);
 
     const onCodeChange = useCallback((value) => {
         setCode(value);
@@ -71,22 +70,18 @@ export default function ProblemPage() {
         console.log("All test cases ran");
 
 
-
         // If any test case fails, return false
         if (testCasesPassed === false) {
             console.log(":(");
             setTestCasesPassed(false);
             return false
         }
-        notifications.show({
-            title: "All test cases passed",
-            message: "Compiling your code...",
-            color: theme.background,
-            autoClose: 1000,
-        })
+
+        console.log("here");
+
 
         // 2 If valid, send to server for compilation
-        fetch("https://optimizer-service-205616280235.us-central1.run.app/check", {
+        fetch("http://localhost:1738/check", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -99,39 +94,19 @@ export default function ProblemPage() {
             })
         })
             .then((response) => {
+<<<<<<< HEAD
                 if (!response.ok) {
                     console.log(response);
                 }
+=======
+                console.log(response);
+>>>>>>> d183e28 (IT WORKS (tests example cases and compiles results)
                 return response.text();
             })
             .then((data) => {
                 console.log("Response data:", data);
-                let cpu_metric = Math.floor(Math.random() * 100);
-                let gpu_metric = Math.floor(Math.random() * 100);
-                setCpuMetric(cpu_metric);
-                setGpuMetric(gpu_metric);
-                // 3 If compilation successful, send to server for tracking
-                trackSolution(uid, prob.id, {
-                    code: code,
-                    finished: true,
-                    probid: prob.id,
-                    uid: uid,
-                    // Generate random numbers for metrics for now
-                    cpu_metric: cpu_metric,
-                    gpu_metric: gpu_metric,
-                })
-                    .then(() => {
-                        notifications.show({
-                            title: 'Code compiled successfully!',
-                            message: `CPU Metric: ${cpuMetric}, GPU Metric: ${gpuMetric}`,
-                            color: "green",
-                            autoClose: 2000,
-                        })
-                        console.log("Notification should send");
-
-                    })
             });
-    }
+    };
 
     useEffect(() => {
         getProblemBySlug(ptitle).then((prob) => {

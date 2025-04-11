@@ -21,9 +21,10 @@
         "storybook:build": "storybook build"
     },
     "dependencies": {
-        "@mantine/core": "7.15.1",
+        "@mantine/core": "^7.17.4",
         "@mantine/form": "^7.17.2",
-        "@mantine/hooks": "7.15.1",
+        "@mantine/hooks": "^7.17.4",
+        "@mantine/notifications": "^7.17.4",
         "@monaco-editor/react": "^4.7.0",
         "@next/bundle-analyzer": "^14.2.4",
         "@tabler/icons-react": "^3.26.0",

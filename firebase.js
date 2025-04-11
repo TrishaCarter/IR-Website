@@ -92,7 +92,7 @@ export let createProblem = async (data) => {
 export let trackSolution = async (uid, problemId, data) => {
 
     // Check if solution for uid/problemID combo exists
-    const q = query(collection(db, `SOLUTIONS`), where('problemId', '==', problemId), where('uid', '==', uid));
+    const q = query(collection(db, `SOLUTIONS`), where('probid', '==', problemId), where('uid', '==', uid));
     const snapshot = await getDocs(q);
 
     // If solution instance exists, update it
@@ -124,6 +124,30 @@ export let getUserSolutions = async (uid) => {
     } else {
         console.log(`No solutions found for user ${uid}`);
         return [];
+    }
+}
+
+export let getProblemSolutions = async (problemId) => {
+    const q = query(collection(db, 'SOLUTIONS'), where('probid', '==', problemId));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } else {
+        console.log(`No solutions found for problem ${problemId}`);
+        return [];
+    }
+}
+
+export let getUserById = async (uid) => {
+    let docRef = doc(db, 'USERS', uid);
+    let docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        return docSnap.data();
+    } else {
+        console.log("No such document!");
+        return null;
     }
 }
 
