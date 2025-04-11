@@ -1,6 +1,7 @@
 import {
     Title, Text, Box, Flex,
-    Button, NativeSelect, Divider
+    Button, NativeSelect, Divider,
+    Notification
 } from "@mantine/core";
 import { RemoveScroll } from "react-remove-scroll";
 import { useRouter } from "next/router";
@@ -8,6 +9,7 @@ import Navbar from "../../../components/Navbar";
 import { useCallback, useEffect, useState } from "react";
 import { auth, getProblemBySlug, trackSolution } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
+import { notifications } from "@mantine/notifications";
 
 export default function ProblemPage() {
     let router = useRouter();
@@ -17,6 +19,8 @@ export default function ProblemPage() {
     const [code, setCode] = useState("");
     const [passedCases, setPassedCases] = useState([]);
     const [testCasesPassed, setTestCasesPassed] = useState(false);
+    const [cpuMetric, setCpuMetric] = useState(0);
+    const [gpuMetric, setGpuMetric] = useState(0);
 
     const onCodeChange = useCallback((value) => {
         setCode(value);
@@ -72,6 +76,12 @@ export default function ProblemPage() {
             setTestCasesPassed(false);
             return false
         }
+        notifications.show({
+            title: "All test cases passed",
+            message: "Compiling your code...",
+            color: "green",
+            autoClose: 1000,
+        })
 
         // 2 If valid, send to server for compilation
         fetch("http://localhost:1738/check", {
@@ -90,6 +100,10 @@ export default function ProblemPage() {
             })
             .then((data) => {
                 console.log("Response data:", data);
+                let cpu_metric = Math.floor(Math.random() * 100);
+                let gpu_metric = Math.floor(Math.random() * 100);
+                setCpuMetric(cpu_metric);
+                setGpuMetric(gpu_metric);
                 // 3 If compilation successful, send to server for tracking
                 trackSolution(uid, prob.id, {
                     code: code,
@@ -97,9 +111,16 @@ export default function ProblemPage() {
                     probid: prob.id,
                     uid: uid,
                     // Generate random numbers for metrics for now
-                    cpu_metric: Math.floor(Math.random() * 100),
-                    gpu_metric: Math.floor(Math.random() * 100),
-                });
+                    cpu_metric: cpuMetric,
+                    gpu_metric: gpuMetric,
+                })
+                    .then(() => {
+                        <Notification title="Code compiled successfully!" color="green">
+                            CPU: {cpuMetric}% | GPU: {gpuMetric}%
+                        </Notification>
+                        console.log("Notification should send");
+
+                    })
             });
     }
 

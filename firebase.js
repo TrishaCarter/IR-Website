@@ -92,7 +92,7 @@ export let createProblem = async (data) => {
 export let trackSolution = async (uid, problemId, data) => {
 
     // Check if solution for uid/problemID combo exists
-    const q = query(collection(db, `SOLUTIONS`), where('problemId', '==', problemId), where('uid', '==', uid));
+    const q = query(collection(db, `SOLUTIONS`), where('probid', '==', problemId), where('uid', '==', uid));
     const snapshot = await getDocs(q);
 
     // If solution instance exists, update it
