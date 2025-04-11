@@ -13,7 +13,6 @@ import Navbar from "../../../components/Navbar";
 import { useCallback, useEffect, useState } from "react";
 import { auth, getProblemBySlug } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
-import { run } from "node:test";
 
 export default function ProblemPage() {
     let router = useRouter();
@@ -30,17 +29,20 @@ export default function ProblemPage() {
     const runTestCases = () => {
 
         prob.examples.map((example, index) => {
-            fetch("http://localhost:5000/run-test", {
+            let body = {
+                code: code,
+                functionName: prob.slugTitle,
+                testCase: example.inputs,
+                output: example.output,
+            }
+            console.log(body);
+
+            fetch("http://localhost:1739/run_test", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({
-                    code: code,
-                    functionName: prob.slugTitle,
-                    testCase: example.inputs,
-                    output: example.output
-                }),
+                body: JSON.stringify(body),
             })
                 .then((response) => {
                     if (response["passed"] === true) {
