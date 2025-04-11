@@ -1,22 +1,18 @@
 import {
-    Title,
-    Text,
-    Box,
-    Flex,
-    Button,
-    NativeSelect,
-    Divider
+    Title, Text, Box, Flex,
+    Button, NativeSelect, Divider
 } from "@mantine/core";
 import { RemoveScroll } from "react-remove-scroll";
 import { useRouter } from "next/router";
 import Navbar from "../../../components/Navbar";
 import { useCallback, useEffect, useState } from "react";
-import { auth, getProblemBySlug } from "../../../firebase";
+import { auth, getProblemBySlug, trackSolution } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
 
 export default function ProblemPage() {
     let router = useRouter();
     let { ptitle } = router.query;
+    let uid = auth.currentUser?.uid;
     const [prob, setProblem] = useState({});
     const [code, setCode] = useState("");
     const [passedCases, setPassedCases] = useState([]);
@@ -98,8 +94,18 @@ export default function ProblemPage() {
             })
             .then((data) => {
                 console.log("Response data:", data);
+                // 3 If compilation successful, send to server for tracking
+                trackSolution(uid, prob.id, {
+                    code: code,
+                    finished: true,
+                    probid: prob.id,
+                    uid: uid,
+                    // Generate random numbers for metrics for now
+                    cpu_metric: Math.floor(Math.random() * 100),
+                    gpu_metric: Math.floor(Math.random() * 100),
+                });
             });
-    };
+    }
 
     useEffect(() => {
         getProblemBySlug(ptitle).then((prob) => {
