@@ -52,11 +52,15 @@ def generate_main(test_case, function_name):
 {declaration}
 {declarations}
 int main() {{
-    int* result = {slug_to_camel(function_name)}({args_string});
-    for (int i = 0; i < returnSize; i++) {{
-        printf("%d ", result[i]);
+    int* result = {camel_name}({args_string});
+    if (result != NULL) {{
+        for (int i = 0; i < returnSize; i++) {{
+            printf("%d ", result[i]);
+        }}
+        free(result);
+    }} else {{
+        printf("NULL");
     }}
-    free(result);
     return 0;
 }}
 """
@@ -94,23 +98,24 @@ def run_tests():
         
         # Read the output from the file.
         with open("output.txt", "r") as output_file:
-            results = output_file.read().strip()
-            print("Output from the program:")
-            print(results)
-            print("User provided output:")
-            print(output)
+            results_raw = output_file.read().strip()
+            results_list = list(map(int, results_raw.split()))
+            expected_list = eval(output) if isinstance(output, str) else output
+
+            print("Parsed output:", results_list)
+            print("Expected output:", expected_list)
         
         # Clean up the temporary files
         os.remove(temp_file_path)
         os.remove("temp_program")
         os.remove("output.txt")
 
-        if results == output:
+        if results_list == expected_list:
             print("Tests passed")
-            return jsonify({"passed": True, "results": results}), 200
+            return jsonify({"passed": True, "results": results_raw}), 200
         else:
             print("Tests failed")
-            return jsonify({"passed": False, "results": results}), 200
+            return jsonify({"passed": False, "results": results_raw}), 200
         
     except Exception as e:
         print("An error occurred:", str(e))

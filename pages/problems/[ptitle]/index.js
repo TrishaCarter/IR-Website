@@ -28,7 +28,7 @@ export default function ProblemPage() {
 
     const runTestCases = () => {
 
-        prob.examples.map((example, index) => {
+        prob.examples.forEach((example, index) => {
             let body = {
                 code: code,
                 functionName: prob.slugTitle,
@@ -45,10 +45,13 @@ export default function ProblemPage() {
                 body: JSON.stringify(body),
             })
                 .then((response) => {
-                    if (response["passed"] === true) {
+                    return response.json()
+                })
+                .then((data) => {
+                    console.log(data);
+                    if (data["passed"] === true) {
                         console.log(`Test Case ${index + 1} passed`);
                         setPassedCases([...passedCases, index + 1]);
-                        return true;
                     }
                 })
                 .catch((error) => {
@@ -64,12 +67,18 @@ export default function ProblemPage() {
 
         // 1 Check if code is valid solution based on test cases
         let testCasesPassed = runTestCases();
+        console.log("All test cases ran");
+
 
         // If any test case fails, return false
-        if (!testCasesPassed) {
+        if (testCasesPassed === false) {
+            console.log(":(");
             setTestCasesPassed(false);
             return false
         }
+
+        console.log("here");
+
 
         // 2 If valid, send to server for compilation
         fetch("http://localhost:1738/check", {
@@ -83,10 +92,7 @@ export default function ProblemPage() {
             }),
         })
             .then((response) => {
-                if (!response.ok) {
-                    console.log(response);
-
-                }
+                console.log(response);
                 return response.text();
             })
             .then((data) => {
