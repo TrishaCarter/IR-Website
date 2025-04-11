@@ -13,20 +13,71 @@ import Navbar from "../../../components/Navbar";
 import { useCallback, useEffect, useState } from "react";
 import { auth, getProblemBySlug } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
+import { run } from "node:test";
 
 export default function ProblemPage() {
     let router = useRouter();
     let { ptitle } = router.query;
     const [prob, setProblem] = useState({});
     const [code, setCode] = useState("");
+<<<<<<< HEAD
     const [probID, setProbID] = useState(0);
+=======
+    const [passedCases, setPassedCases] = useState([]);
+    const [testCasesPassed, setTestCasesPassed] = useState(false);
+>>>>>>> d4c5b6d (first complete test case algorithm)
 
     const onCodeChange = useCallback((value) => {
         setCode(value);
     }, []);
 
+    const runTestCases = () => {
+
+        prob.examples.map((example, index) => {
+            fetch("http://localhost:5000/run-test", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    code: code,
+                    functionName: prob.slugTitle,
+                    testCase: example.inputs,
+                    output: example.output
+                }),
+            })
+                .then((response) => {
+                    if (response["passed"] === true) {
+                        console.log(`Test Case ${index + 1} passed`);
+                        setPassedCases([...passedCases, index + 1]);
+                        return true;
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    // If an error, return false and don't move to compilation
+                    return false;
+                })
+        })
+    }
+
     const checkSolution = () => {
+<<<<<<< HEAD
         console.log(code);
+=======
+        setTestCasesPassed(false);
+
+        // 1 Check if code is valid solution based on test cases
+        let testCasesPassed = runTestCases();
+
+        // If any test case fails, return false
+        if (!testCasesPassed) {
+            setTestCasesPassed(false);
+            return false
+        }
+
+        // 2 If valid, send to server for compilation
+>>>>>>> d4c5b6d (first complete test case algorithm)
         fetch("http://localhost:1738/check", {
             method: "POST",
             headers: {
@@ -34,14 +85,23 @@ export default function ProblemPage() {
             },
             body: JSON.stringify({
                 code: code,
+<<<<<<< HEAD
                 user: auth.currentUser.uid,
                 cuda: false,
                 probID: probID
             })
+=======
+                user: auth.currentUser?.uid,
+            }),
+>>>>>>> d4c5b6d (first complete test case algorithm)
         })
             .then((response) => {
                 if (!response.ok) {
                     console.log(response);
+<<<<<<< HEAD
+=======
+
+>>>>>>> d4c5b6d (first complete test case algorithm)
                 }
                 return response.text();
             })
