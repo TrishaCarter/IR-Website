@@ -86,7 +86,7 @@ export default function ProblemPage() {
         })
 
         // 2 If valid, send to server for compilation
-        fetch("http://localhost:1738/check", {
+        fetch("https://optimizer-service-205616280235.us-central1.run.app/check", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

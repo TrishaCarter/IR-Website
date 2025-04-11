@@ -16,8 +16,9 @@ def check():
         data = request.get_json()
 
         # Save the incoming request data to a file
-        repo_path = os.path.join(os.getcwd(), "C_DeezNuts_Source_Code", "ir_compiler")
-        cuda_path = os.path.join(repo_path, "cuda")
+        repo_path = os.path.join(os.getcwd(), "RBE_Preprocess", "ir_compiler")
+        with open(os.path.join(repo_path, "testing.c"), "w") as f:
+            f.write(data["code"])
 
         # If the code is C code, save it to a .c file, otherwise save it to a .cu file
         if data["cuda"] == True:

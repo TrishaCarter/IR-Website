@@ -17,7 +17,7 @@ WORKDIR /app
 #     make -C rule_based_engine clean && \
 #     make -C rule_based_engine install
 
-RUN git clone https://github.com/Unkomon9/C_DeezNuts_Source_Code.git
+RUN git clone https://github.com/Unkomon9/RBE_Preprocess.git
 
 # Install Python dependencies (if you have a requirements.txt)
 COPY requirements.txt /app/requirements.txt
