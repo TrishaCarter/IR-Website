@@ -1,3 +1,4 @@
+import '@mantine/core/styles.css';
 import {
     Title, Text, Box, Flex,
     Button, NativeSelect, Divider,
@@ -9,7 +10,7 @@ import Navbar from "../../../components/Navbar";
 import { useCallback, useEffect, useState } from "react";
 import { auth, getProblemBySlug, trackSolution } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
-import { notifications } from "@mantine/notifications";
+import { notifications } from '@mantine/notifications';
 
 export default function ProblemPage() {
     let router = useRouter();
@@ -70,6 +71,7 @@ export default function ProblemPage() {
         console.log("All test cases ran");
 
 
+
         // If any test case fails, return false
         if (testCasesPassed === false) {
             console.log(":(");
@@ -79,7 +81,7 @@ export default function ProblemPage() {
         notifications.show({
             title: "All test cases passed",
             message: "Compiling your code...",
-            color: "green",
+            color: theme.background,
             autoClose: 1000,
         })
 
@@ -111,13 +113,16 @@ export default function ProblemPage() {
                     probid: prob.id,
                     uid: uid,
                     // Generate random numbers for metrics for now
-                    cpu_metric: cpuMetric,
-                    gpu_metric: gpuMetric,
+                    cpu_metric: cpu_metric,
+                    gpu_metric: gpu_metric,
                 })
                     .then(() => {
-                        <Notification title="Code compiled successfully!" color="green">
-                            CPU: {cpuMetric}% | GPU: {gpuMetric}%
-                        </Notification>
+                        notifications.show({
+                            title: 'Code compiled successfully!',
+                            message: `CPU Metric: ${cpuMetric}, GPU Metric: ${gpuMetric}`,
+                            color: "green",
+                            autoClose: 2000,
+                        })
                         console.log("Notification should send");
 
                     })
