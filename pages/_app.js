@@ -6,6 +6,7 @@ import { theme } from '../theme';
 import { useState, useEffect, createContext, useContext } from "react";
 import { auth } from "@/firebase"; // Import auth from your Firebase setup
 import { onAuthStateChanged } from "firebase/auth";
+import { Notifications } from '@mantine/notifications';
 
 export default function App({ Component, pageProps }) {
     return (
@@ -19,6 +20,7 @@ export default function App({ Component, pageProps }) {
                 <link rel="shortcut icon" href="/favicon.svg" />
             </Head>
             <AuthProvider>
+                <Notifications />
                 <Component {...pageProps} />
             </AuthProvider>
         </MantineProvider>
