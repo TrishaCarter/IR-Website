@@ -13,51 +13,83 @@ import Navbar from "../../../components/Navbar";
 import { useCallback, useEffect, useState } from "react";
 import { auth, getProblemBySlug } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
+import { run } from "node:test";
 
 export default function ProblemPage() {
     let router = useRouter();
     let { ptitle } = router.query;
     const [prob, setProblem] = useState({});
     const [code, setCode] = useState("");
+    const [passedCases, setPassedCases] = useState([]);
+    const [testCasesPassed, setTestCasesPassed] = useState(false);
 
     const onCodeChange = useCallback((value) => {
         setCode(value);
     }, []);
 
+    const runTestCases = () => {
+
+        prob.examples.map((example, index) => {
+            fetch("http://localhost:5000/run-test", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    code: code,
+                    functionName: prob.slugTitle,
+                    testCase: example.inputs,
+                    output: example.output
+                }),
+            })
+                .then((response) => {
+                    if (response["passed"] === true) {
+                        console.log(`Test Case ${index + 1} passed`);
+                        setPassedCases([...passedCases, index + 1]);
+                        return true;
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    // If an error, return false and don't move to compilation
+                    return false;
+                })
+        })
+    }
+
     const checkSolution = () => {
-        console.log(code);
+        setTestCasesPassed(false);
 
-        // 1. Validate code with test cases
+        // 1 Check if code is valid solution based on test cases
+        let testCasesPassed = runTestCases();
 
-        // 1.a If valid, send to server for compilation
+        // If any test case fails, return false
+        if (!testCasesPassed) {
+            setTestCasesPassed(false);
+            return false
+        }
 
-        // 2. Send code to server for compilation
+        // 2 If valid, send to server for compilation
+        fetch("http://localhost:1738/check", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                code: code,
+                user: auth.currentUser?.uid,
+            }),
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    console.log(response);
 
-        // 2.a If valid, show success message 
-
-        // 2.b If invalid, show error message
-
-        // 1.b If invalid, show error message
-
-        // fetch("http://localhost:1738/check", {
-        //     method: "POST",
-        //     headers: {
-        //         "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({
-        //         code: code,
-        //         user: auth.currentUser?.uid,
-        //     }),
-        // })
-        //     .then((response) => {
-        //         if (!response.ok) {
-        //             console.log(response);
-        //         }
-        //         return response.text();
-        //     })
-        //     .then((data) => {
-        //         console.log("Response data:", data);
-        //     });
+                }
+                return response.text();
+            })
+            .then((data) => {
+                console.log("Response data:", data);
+            });
     };
 
     useEffect(() => {
