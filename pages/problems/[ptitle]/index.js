@@ -152,21 +152,17 @@ export default function ProblemPage() {
                     finished: true,
                     probid: prob.id,
                     uid: uid,
+                    score: score,
                     // Generate random numbers for metrics for now
                     cpu_metric: cpu_metric,
                     gpu_metric: gpu_metric,
                 })
                     .then(() => {
-                        updateUserScore(auth.currentUser.uid, score)
-                            .then(() => {
-                                notifications.show({
-                                    title: 'Code compiled successfully!',
-                                    color: "green",
-                                    autoClose: 2000,
-                                })
-                                console.log("Notification should send");
-                            })
-
+                        notifications.show({
+                            title: 'Code compiled successfully!',
+                            color: "green",
+                            autoClose: 2000,
+                        })
                     })
             });
     }

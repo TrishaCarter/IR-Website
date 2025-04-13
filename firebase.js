@@ -98,16 +98,28 @@ export let trackSolution = async (uid, problemId, data) => {
 
     // If solution instance exists, update it
     if (!snapshot.empty) {
-        snapshot.forEach(async (doc) => {
-            await setDoc(doc.ref, data, { merge: true });
-            console.log(`Solution for problem ${problemId} updated for user ${uid}`);
-        });
+        const existingDoc = snapshot.docs[0];
+        const existingScore = existingDoc.data().score || 0;
+
+        if (data.score > existingScore) {
+            // Calculate how many additional points to give.
+            const scoreDiff = data.score - existingScore;
+            // Update the solution to reflect the new best attempt.
+            if (scoreDiff > 0) await setDoc(existingDoc.ref, data, { merge: true });
+            // Update the user's currency with the additional points.
+            await updateUserScore(uid, scoreDiff);
+            console.log(`New high score for problem ${problemId} from user ${uid}: +${scoreDiff} points.`);
+        } else {
+            // New submission is not better than the existing solution.
+            console.log("User's submission did not improve over previous best; no reward given.");
+        }
 
         return;
     } else {
         // If solution instance does not exist, create it
         try {
             let docRef = await addDoc(collection(db, "SOLUTIONS"), data);
+            await updateUserScore(uid, data.score);
             console.log(`Solution for problem ${problemId} tracked with ID ${docRef.id}`);
 
         } catch (error) {
