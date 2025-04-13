@@ -2,7 +2,6 @@ import '@mantine/core/styles.css';
 import {
     Title, Text, Box, Flex,
     Button, NativeSelect, Divider,
-    Notification
 } from "@mantine/core";
 import { RemoveScroll } from "react-remove-scroll";
 import { useRouter } from "next/router";
@@ -28,63 +27,85 @@ export default function ProblemPage() {
         setCode(value);
     }, []);
 
-    const runTestCases = () => {
-
-        prob.examples.forEach((example, index) => {
-            let body = {
+    const runTestCases = async () => {
+        const testPromises = prob.examples.map((example, index) => {
+            const body = {
                 code: code,
                 functionName: prob.slugTitle,
                 testCase: example.inputs,
                 output: example.output,
-            }
-            console.log(body);
+            };
 
-            fetch("http://localhost:1739/run_test", {
+            return fetch("http://localhost:1739/run_test", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify(body),
             })
-                .then((response) => {
-                    return response.json()
-                })
+                .then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
-                    if (data["passed"] === true) {
-                        console.log(`Test Case ${index + 1} passed`);
-                        setPassedCases([...passedCases, index + 1]);
+                    if (data.passed === true) {
+                        notifications.show({
+                            title: `Test Case ${index + 1} passed`,
+                            message: "Test passed",
+                            color: "green",
+                            autoClose: 1000,
+                        });
+                        return true;
+                    } else {
+                        notifications.show({
+                            title: `Test Case ${index + 1} failed`,
+                            message: "Your solution did not pass this test case",
+                            color: "red",
+                            autoClose: 2000,
+                        });
+                        return false;
                     }
                 })
                 .catch((error) => {
-                    console.error("Error:", error);
-                    // If an error, return false and don't move to compilation
+                    notifications.show({
+                        title: `Test Case ${index + 1} error`,
+                        message: "Error executing test case",
+                        color: "red",
+                        autoClose: 2000,
+                    });
                     return false;
-                })
-        })
-    }
+                });
+        });
 
-    const checkSolution = () => {
+        // Wait for all test case promises to complete
+        const testResults = await Promise.all(testPromises);
+        // If every test returned true then all passed
+        return testResults.every((result) => result === true);
+    };
+
+    const checkSolution = async () => {
         setTestCasesPassed(false);
 
         // 1 Check if code is valid solution based on test cases
-        let testCasesPassed = runTestCases();
+        const allCasesPassed = await runTestCases();
         console.log("All test cases ran");
 
-
-
         // If any test case fails, return false
-        if (testCasesPassed === false) {
-            console.log(":(");
-            setTestCasesPassed(false);
-            return false
+        if (!allCasesPassed) {
+            // Notify user and stop submission
+            notifications.show({
+                title: "Submission halted",
+                message: "One or more test cases failed.",
+                color: "red",
+                autoClose: 2000,
+            });
+            return; // Stop further processing
         }
+
+        // All test cases passed, continue with the submission process
         notifications.show({
             title: "All test cases passed",
             message: "Compiling your code...",
-            color: theme.background,
+            color: "green",
             autoClose: 1000,
-        })
+        });
 
         // 2 If valid, send to server for compilation
         fetch("https://optimizer-service-205616280235.us-central1.run.app/check", {
@@ -94,7 +115,7 @@ export default function ProblemPage() {
             },
             body: JSON.stringify({
                 code: code,
-                user: auth.currentUser.uid,
+                user: auth.currentUser?.uid,
                 cuda: false,
                 probID: probID
             })
