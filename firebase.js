@@ -7,7 +7,8 @@ import {
     getFirestore, doc,
     getDoc, setDoc,
     collection, getDocs,
-    addDoc, query, where
+    addDoc, query, where,
+    updateDoc, increment
 } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -149,6 +150,14 @@ export let getUserById = async (uid) => {
         console.log("No such document!");
         return null;
     }
+}
+
+export let updateUserScore = async (uid, score) => {
+    const userDocRef = doc(db, 'USERS', uid);
+    // Increment the user's currency balance by the score.
+    await updateDoc(userDocRef, {
+        currency: increment(score),
+    });
 }
 
 export default app;

@@ -7,7 +7,7 @@ import { RemoveScroll } from "react-remove-scroll";
 import { useRouter } from "next/router";
 import Navbar from "../../../components/Navbar";
 import { useCallback, useEffect, useState } from "react";
-import { auth, getProblemBySlug, trackSolution } from "../../../firebase";
+import { auth, getProblemBySlug, trackSolution, updateUserScore } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
 import { notifications } from '@mantine/notifications';
 
@@ -26,6 +26,16 @@ export default function ProblemPage() {
     const onCodeChange = useCallback((value) => {
         setCode(value);
     }, []);
+
+    const MAX_METRIC = 100;
+
+    function calculateScore(cpu_metric, gpu_metric) {
+        // The lower the metric, the higher the score.
+        const cpuPoints = MAX_METRIC - cpu_metric;
+        const gpuPoints = MAX_METRIC - gpu_metric;
+        // Ensure the score isn't negative:
+        return Math.max(cpuPoints + gpuPoints, 0);
+    }
 
     const runTestCases = async () => {
         const testPromises = prob.examples.map((example, index) => {
@@ -132,6 +142,10 @@ export default function ProblemPage() {
                 let gpu_metric = Math.floor(Math.random() * 100);
                 setCpuMetric(cpu_metric);
                 setGpuMetric(gpu_metric);
+
+                let score = calculateScore(cpu_metric, gpu_metric);
+                console.log("Score:", score);
+
                 // 3 If compilation successful, send to server for tracking
                 trackSolution(uid, prob.id, {
                     code: code,
@@ -143,12 +157,15 @@ export default function ProblemPage() {
                     gpu_metric: gpu_metric,
                 })
                     .then(() => {
-                        notifications.show({
-                            title: 'Code compiled successfully!',
-                            color: "green",
-                            autoClose: 2000,
-                        })
-                        console.log("Notification should send");
+                        updateUserScore(auth.currentUser.uid, score)
+                            .then(() => {
+                                notifications.show({
+                                    title: 'Code compiled successfully!',
+                                    color: "green",
+                                    autoClose: 2000,
+                                })
+                                console.log("Notification should send");
+                            })
 
                     })
             });
