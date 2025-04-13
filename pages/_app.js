@@ -1,4 +1,6 @@
 import '@mantine/notifications/styles.css';
+import '@mantine/core/styles.css';
+
 import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
 import { useState, useEffect, createContext, useContext } from "react";

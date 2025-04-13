@@ -124,7 +124,6 @@ export default function ProblemPage() {
                     .then(() => {
                         notifications.show({
                             title: 'Code compiled successfully!',
-                            message: `CPU Metric: ${cpuMetric}, GPU Metric: ${gpuMetric}`,
                             color: "green",
                             autoClose: 2000,
                         })
