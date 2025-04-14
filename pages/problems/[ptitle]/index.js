@@ -17,11 +17,7 @@ export default function ProblemPage() {
     let uid = auth.currentUser?.uid;
     const [prob, setProblem] = useState({});
     const [code, setCode] = useState("");
-    const [passedCases, setPassedCases] = useState([]);
-    const [testCasesPassed, setTestCasesPassed] = useState(false);
     const [probID, setProbID] = useState("");
-    const [cpuMetric, setCpuMetric] = useState(0);
-    const [gpuMetric, setGpuMetric] = useState(0);
 
     const onCodeChange = useCallback((value) => {
         setCode(value);
@@ -180,8 +176,6 @@ export default function ProblemPage() {
     };
 
     const checkSolution = async () => {
-        setTestCasesPassed(false);
-
         // Run test cases; only proceed if all pass.
         const allCasesPassed = await runTestCases();
         console.log("All test cases ran");
@@ -230,8 +224,6 @@ export default function ProblemPage() {
                 console.log("Response data:", data);
                 let cpu_metric = Math.floor(Math.random() * 100);
                 let gpu_metric = Math.floor(Math.random() * 100);
-                setCpuMetric(cpu_metric);
-                setGpuMetric(gpu_metric);
 
                 let score = calculateScore(cpu_metric, gpu_metric);
                 console.log("Score:", score);
@@ -308,7 +300,7 @@ export default function ProblemPage() {
                         w={"40%"}
                         h={"70vh"}
                         mr={10}
-                        style={{ border: `1px solid ${theme.accentColor}` }}
+                        style={{ border: `1px solid ${theme.accentColor}`, overflowY: "auto" }}
                         pt={10}
                         px={"md"}
                         sx={{ overflowY: "auto" }}
@@ -399,6 +391,7 @@ export default function ProblemPage() {
                                 ))}
                         </Box>
                     </Box>
+
 
                     {/* Right Column: Code Editor */}
                     <Box
