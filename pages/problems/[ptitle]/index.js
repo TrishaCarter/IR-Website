@@ -2,13 +2,12 @@ import '@mantine/core/styles.css';
 import {
     Title, Text, Box, Flex,
     Button, NativeSelect, Divider,
-    Notification
 } from "@mantine/core";
 import { RemoveScroll } from "react-remove-scroll";
 import { useRouter } from "next/router";
 import Navbar from "../../../components/Navbar";
 import { useCallback, useEffect, useState } from "react";
-import { auth, getProblemBySlug, trackSolution } from "../../../firebase";
+import { auth, getProblemBySlug, trackSolution, updateUserScore } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
 import { notifications } from '@mantine/notifications';
 
@@ -18,120 +17,235 @@ export default function ProblemPage() {
     let uid = auth.currentUser?.uid;
     const [prob, setProblem] = useState({});
     const [code, setCode] = useState("");
-    const [passedCases, setPassedCases] = useState([]);
-    const [testCasesPassed, setTestCasesPassed] = useState(false);
     const [probID, setProbID] = useState("");
-    const [cpuMetric, setCpuMetric] = useState(0);
-    const [gpuMetric, setGpuMetric] = useState(0);
 
     const onCodeChange = useCallback((value) => {
         setCode(value);
     }, []);
 
-    const runTestCases = () => {
+    const MAX_METRIC = 100;
 
-        prob.examples.forEach((example, index) => {
-            let body = {
+    function calculateScore(cpu_metric, gpu_metric) {
+        // The lower the metric, the higher the score.
+        const cpuPoints = MAX_METRIC - cpu_metric;
+        const gpuPoints = MAX_METRIC - gpu_metric;
+        // Ensure the score isn't negative:
+        return Math.max(cpuPoints + gpuPoints, 0);
+    }
+
+    // const runTestCases = async () => {
+
+    //     const testPromises = prob.examples.map((example, index) => {
+    //         // Build a structured test case array where each input contains name, type, and value
+    //         const structuredInputs = example.inputs.map(inp => {
+    //             return {
+    //                 name: inp.name,
+    //                 type: inp.type || "int",
+    //                 // If inp.value is a string starting with "[" assume it's an array in string form,
+    //                 // and try to parse it, otherwise leave it as is
+    //                 value: typeof inp.value === "string" && inp.value.trim().startsWith("[")
+    //                     ? JSON.parse(inp.value)
+    //                     : inp.value
+    //             };
+    //         });
+
+    //         const testPayload = {
+    //             code: code,
+    //             functionName: prob.functionName,
+    //             resultType: prob.resultType,
+    //             testCase: structuredInputs,
+    //             output: example.output
+    //         };
+
+    //         return fetch("http://localhost:1739/run_test", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify(testPayload),
+    //         })
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 console.log(`Test case ${index + 1} response:`, data);
+
+    //                 if (data.passed === true) {
+    //                     notifications.show({
+    //                         title: `Test Case ${index + 1} passed`,
+    //                         message: "Test passed",
+    //                         color: "green",
+    //                         autoClose: 1000,
+    //                     });
+    //                     return true;
+    //                 } else {
+    //                     notifications.show({
+    //                         title: `Test Case ${index + 1} failed`,
+    //                         message: "Your solution did not pass this test case",
+    //                         color: "red",
+    //                         autoClose: 2000,
+    //                     });
+    //                     return false;
+    //                 }
+    //             })
+    //             .catch((error) => {
+    //                 notifications.show({
+    //                     title: `Test Case ${index + 1} error`,
+    //                     message: "Error executing test case",
+    //                     color: "red",
+    //                     autoClose: 2000,
+    //                 });
+    //                 return false;
+    //             });
+    //     });
+
+    //     // Wait for all test case promises to complete
+    //     const testResults = await Promise.all(testPromises);
+    //     console.log("Test results:", testResults);
+
+    //     // If every test returned true then all passed
+    //     return testResults.every(result => result === true);
+    // };
+
+    const runTestCases = async () => {
+        const testPromises = prob.examples.map((example, index) => {
+            // Build a structured "inputs" array for this test case.
+            const structuredInputs = example.inputs.map(inp => {
+                return {
+                    name: inp.name,
+                    type: inp.type || "int",
+                    // If inp.value is a string starting with "[" assume it's JSON
+                    value: (typeof inp.value === "string" && inp.value.trim().startsWith("["))
+                        ? JSON.parse(inp.value)
+                        : inp.value
+                };
+            });
+
+            // Build the test case object with both inputs and output
+            const testCasePayload = {
                 code: code,
-                functionName: prob.slugTitle,
-                testCase: example.inputs,
-                output: example.output,
-            }
-            console.log(body);
+                functionName: prob.functionName,
+                resultType: prob.resultType,
+                testCase: {
+                    inputs: structuredInputs,
+                    output: example.output
+                }
+            };
 
-            fetch("http://localhost:1739/run_test", {
+            return fetch("http://localhost:1739/run_test", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(body),
+                body: JSON.stringify(testCasePayload),
             })
-                .then((response) => {
-                    return response.json()
-                })
-                .then((data) => {
-                    console.log(data);
-                    if (data["passed"] === true) {
-                        console.log(`Test Case ${index + 1} passed`);
-                        setPassedCases([...passedCases, index + 1]);
+                .then(response => response.json())
+                .then(data => {
+                    console.log(`Test case ${index + 1} response:`, data);
+                    if (data.passed === true) {
+                        notifications.show({
+                            title: `Test Case ${index + 1} passed`,
+                            message: "Test passed",
+                            color: "green",
+                            autoClose: 1000,
+                        });
+                        return true;
+                    } else {
+                        notifications.show({
+                            title: `Test Case ${index + 1} failed`,
+                            message: "Your solution did not pass this test case",
+                            color: "red",
+                            autoClose: 2000,
+                        });
+                        return false;
                     }
                 })
                 .catch((error) => {
-                    console.error("Error:", error);
-                    // If an error, return false and don't move to compilation
+                    notifications.show({
+                        title: `Test Case ${index + 1} error`,
+                        message: "Error executing test case",
+                        color: "red",
+                        autoClose: 2000,
+                    });
                     return false;
-                })
-        })
-    }
+                });
+        });
 
-    const checkSolution = () => {
-        setTestCasesPassed(false);
+        // Wait for all test case promises to complete
+        const testResults = await Promise.all(testPromises);
+        console.log("Test results:", testResults);
+        return testResults.every(result => result === true);
+    };
 
-        // 1 Check if code is valid solution based on test cases
-        let testCasesPassed = runTestCases();
+    const checkSolution = async () => {
+        // Run test cases; only proceed if all pass.
+        const allCasesPassed = await runTestCases();
         console.log("All test cases ran");
 
-
-
-        // If any test case fails, return false
-        if (testCasesPassed === false) {
-            console.log(":(");
-            setTestCasesPassed(false);
-            return false
+        if (!allCasesPassed) {
+            notifications.show({
+                title: "Submission halted",
+                message: "One or more test cases failed.",
+                color: "red",
+                autoClose: 2000,
+            });
+            return; // Stop further processing
         }
+
         notifications.show({
             title: "All test cases passed",
             message: "Compiling your code...",
-            color: theme.background,
+            color: "green",
             autoClose: 1000,
-        })
+        });
 
-        // 2 If valid, send to server for compilation
-        fetch("https://optimizer-service-205616280235.us-central1.run.app/check", {
+        console.log(probID);
+
+
+        fetch("http://localhost:1738/check", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
                 code: code,
-                user: auth.currentUser.uid,
+                user: auth.currentUser?.uid,
                 cuda: false,
                 probID: probID
             })
         })
-            .then((response) => {
+            .then(response => {
                 if (!response.ok) {
                     console.log(response);
+                    // } else {
                 }
                 return response.text();
             })
-            .then((data) => {
+            .then(data => {
+                // if (data === undefined) return;
                 console.log("Response data:", data);
                 let cpu_metric = Math.floor(Math.random() * 100);
                 let gpu_metric = Math.floor(Math.random() * 100);
-                setCpuMetric(cpu_metric);
-                setGpuMetric(gpu_metric);
-                // 3 If compilation successful, send to server for tracking
+
+                let score = calculateScore(cpu_metric, gpu_metric);
+                console.log("Score:", score);
+
                 trackSolution(uid, prob.id, {
                     code: code,
                     finished: true,
                     probid: prob.id,
                     uid: uid,
-                    // Generate random numbers for metrics for now
+                    score: score,
                     cpu_metric: cpu_metric,
                     gpu_metric: gpu_metric,
                 })
                     .then(() => {
                         notifications.show({
-                            title: 'Code compiled successfully!',
+                            title: "Code compiled successfully!",
                             color: "green",
                             autoClose: 2000,
-                        })
-                        console.log("Notification should send");
-
-                    })
+                        });
+                    });
             });
-    }
+    };
 
     useEffect(() => {
         getProblemBySlug(ptitle).then((prob) => {
@@ -186,7 +300,7 @@ export default function ProblemPage() {
                         w={"40%"}
                         h={"70vh"}
                         mr={10}
-                        style={{ border: `1px solid ${theme.accentColor}` }}
+                        style={{ border: `1px solid ${theme.accentColor}`, overflowY: "auto" }}
                         pt={10}
                         px={"md"}
                         sx={{ overflowY: "auto" }}
@@ -277,6 +391,7 @@ export default function ProblemPage() {
                                 ))}
                         </Box>
                     </Box>
+
 
                     {/* Right Column: Code Editor */}
                     <Box

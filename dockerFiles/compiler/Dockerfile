@@ -2,7 +2,8 @@
 FROM ubuntu
 
 # Install build dependencies
-RUN apt update && apt install -y git build-essential curl tar python3 python3-pip gcc linux-tools-generic nvidia-cuda-toolkit 
+RUN apt update && apt install -y git build-essential curl tar python3 python3-pip gcc linux-tools-generic
+#  nvidia-cuda-toolkit 
 
 WORKDIR /app
 
