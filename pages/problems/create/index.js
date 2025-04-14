@@ -1,34 +1,59 @@
 import { useEffect, useState } from 'react';
-import { TextInput, Textarea, Button, Group, Title, Flex, Container, ScrollArea, Space, Text, Divider, ActionIcon } from '@mantine/core';
+import {
+    TextInput,
+    Textarea,
+    Button,
+    Group,
+    Title,
+    Flex,
+    Container,
+    ScrollArea,
+    Space,
+    Text,
+    Divider,
+    ActionIcon
+} from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import Navbar from '../../../components/Navbar';
 import { createProblem } from '../../../firebase';
 import { Editor } from "@monaco-editor/react";
 
 export default function CreateProblem() {
+    // Basic problem info
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('Refactr Dev Team');
     const [description, setDescription] = useState('');
-    // Constraints for the solution, e.g. "num" or "target"
-    const [constraints, setConstraints] = useState([""]);
-    // Function arguments for the problem (used to build examples)
-    const [args, setArgs] = useState([""]);
-    // Examples now is an array of objects with { inputs, output }.
-    // Each inputs is an array of objects with { name, value }.
+
+    // Metadata for code testing / generation
+    const [functionName, setFunctionName] = useState('');
+    const [resultType, setResultType] = useState('int'); // defaults to int
+
+    // Optional additional constraints the solution must satisfy
+    const [constraints, setConstraints] = useState([]);
+
+    // Function arguments - these represent the inputs to the function under test.
+    // We store them as strings.
+    const [args, setArgs] = useState([]);
+
+    // Examples: each example is an object with an array of inputs and an expected output.
+    // Each input in an example has { name, value }.
     const [examples, setExamples] = useState([
         {
+            // initially, if no args are defined, we start with an empty list.
             inputs: args.map(arg => ({ name: arg, value: "" })),
             output: ""
         }
     ]);
-    const [defaultCode, setDefaultCode] = useState(
-        "/** * Note: The returned array must be malloced, assume caller calls free(). */\nint* twoSum(int* nums, int numsSize, int target, int* returnSize) { \n\n} "
-    );
 
+    // The default code that will be displayed in the editor.
+    const [defaultCode, setDefaultCode] = useState("");
+
+    // Error states for form validation
     const [titleErr, setTitleErr] = useState(false);
+    const [functionNameErr, setFunctionNameErr] = useState(false);
+    const [resultTypeErr, setResultTypeErr] = useState(false);
     const [authorErr, setAuthorErr] = useState(false);
     const [descriptionErr, setDescriptionErr] = useState(false);
-    const [constraintsErr, setConstraintsErr] = useState(false);
     const [argsErr, setArgsErr] = useState(false);
     const [examplesErr, setExamplesErr] = useState(false);
     const [defaultCodeErr, setDefaultCodeErr] = useState(false);
@@ -41,21 +66,7 @@ export default function CreateProblem() {
         accentColor: '#629C44',
     };
 
-    // When constraints change, update each example's inputs to ensure they match.
-    useEffect(() => {
-        setExamples(prevExamples =>
-            prevExamples.map(example => {
-                const newInputs = constraints.map(constraint => {
-                    // Try to preserve any existing value for this constraint.
-                    const existing = example.inputs.find(inp => inp.name === constraint);
-                    return existing ? existing : { name: constraint, value: "" };
-                });
-                return { ...example, inputs: newInputs };
-            })
-        );
-    }, [constraints]);
-
-    // When function arguments (args) change, update each example's inputs accordingly.
+    // When function arguments (args) change, update each example's inputs to match.
     useEffect(() => {
         setExamples(prevExamples =>
             prevExamples.map(example => {
@@ -69,56 +80,74 @@ export default function CreateProblem() {
     }, [args]);
 
     let handleFormSubmit = async () => {
-        // Basic client-side validations.
-        if (title === "") setTitleErr(true);
-        if (author === "") setAuthorErr(true);
-        if (description === "") setDescriptionErr(true);
-        if (constraints[0] === "") setConstraintsErr(true);
-        if (args[0] === "") setArgsErr(true);
-        // Check that every example has all inputs and a non-empty output.
-        if (examples.length === 0 || examples.some(ex => ex.inputs.some(inp => inp.value === "") || ex.output === "")) {
+        // Basic client-side validations:
+        if (title.trim() === "") setTitleErr(true);
+        if (functionName.trim() === "") setFunctionNameErr(true);
+        if (resultType.trim() === "") setResultTypeErr(true);
+        if (author.trim() === "") setAuthorErr(true);
+        if (description.trim() === "") setDescriptionErr(true);
+        if (args.length === 0 || args[0].trim() === "") setArgsErr(true);
+        if (
+            examples.length === 0 ||
+            examples.some(ex => ex.inputs.some(inp => inp.value === "") || ex.output.trim() === "")
+        ) {
             setExamplesErr(true);
         }
-        if (title === "" || author === "" || description === "" || constraints.length === 0 || args.length === 0 || examples.length === 0 || defaultCode === "") {
-            return;
-        } else {
-            try {
-                let data = {
-                    title: title,
-                    slugTitle: title.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-'),
-                    author: author,
-                    description: description,
-                    constraints: constraints,
-                    // examples are sent as an array of objects with inputs and output.
-                    examples: examples,
-                    defaultCode: defaultCode
-                };
+        if (defaultCode.trim() === "") setDefaultCodeErr(true);
 
-                await createProblem(data);
-                console.log("Problem added to DB");
-                // Reset state
-                setTitle('');
-                setAuthor('Refactr Dev Team');
-                setDescription('');
-                setConstraints([""]);
-                setArgs([""]);
-                setExamples([
-                    {
-                        inputs: [""].map(arg => ({ name: arg, value: "" })),
-                        output: ""
-                    }
-                ]);
-                setDefaultCode("/** * Note: The returned array must be malloced, assume caller calls free(). */\nint* twoSum(int* nums, int numsSize, int target, int* returnSize) { \n\n} ");
-                setTitleErr(false);
-                setAuthorErr(false);
-                setDescriptionErr(false);
-                setConstraintsErr(false);
-                setArgsErr(false);
-                setExamplesErr(false);
-                setDefaultCodeErr(false);
-            } catch (error) {
-                console.error('Error creating problem: ', error);
-            }
+        // If any required field is missing, do not submit.
+        if (
+            title.trim() === "" ||
+            functionName.trim() === "" ||
+            resultType.trim() === "" ||
+            author.trim() === "" ||
+            description.trim() === "" ||
+            args.length === 0 ||
+            examples.length === 0 ||
+            defaultCode.trim() === ""
+        ) {
+            return;
+        }
+
+        try {
+            let data = {
+                title: title,
+                functionName: functionName,
+                resultType: resultType,
+                // Create a slug from the title.
+                slugTitle: title.toLowerCase().replace(/[^a-z0-9\s]/g, '').trim().replace(/\s+/g, '-'),
+                author: author,
+                description: description,
+                constraints: constraints,  // can be empty
+                // Send examples as an array of objects with inputs and output.
+                examples: examples,
+                defaultCode: defaultCode,
+                args: args  // optional: include the function arguments list as metadata
+            };
+
+            await createProblem(data);
+            console.log("Problem added to DB");
+            // Reset state after submission:
+            setTitle('');
+            setFunctionName('');
+            setResultType('int');
+            setAuthor('Refactr Dev Team');
+            setDescription('');
+            setConstraints([]);
+            setArgs([]);
+            setExamples([{ inputs: [], output: "" }]);
+            setDefaultCode("");
+            // Reset error states
+            setTitleErr(false);
+            setFunctionNameErr(false);
+            setResultTypeErr(false);
+            setAuthorErr(false);
+            setDescriptionErr(false);
+            setArgsErr(false);
+            setExamplesErr(false);
+            setDefaultCodeErr(false);
+        } catch (error) {
+            console.error('Error creating problem: ', error);
         }
     };
 
@@ -130,6 +159,7 @@ export default function CreateProblem() {
                     Create a Problem
                 </Title>
                 <Container style={{ width: "50%", margin: "auto" }}>
+                    {/* Title */}
                     <Text>Title</Text>
                     {titleErr && <Text color="red">Title is required</Text>}
                     <TextInput
@@ -140,6 +170,29 @@ export default function CreateProblem() {
                         w={"30vw"}
                     />
 
+                    {/* Function Name */}
+                    <Text>Function Name</Text>
+                    {functionNameErr && <Text color="red">Function Name is required</Text>}
+                    <TextInput
+                        placeholder="Enter the function name (e.g., gcd)"
+                        value={functionName}
+                        onChange={(e) => setFunctionName(e.target.value)}
+                        mb="md"
+                        w={"30vw"}
+                    />
+
+                    {/* Result Type */}
+                    <Text>Result Type</Text>
+                    {resultTypeErr && <Text color="red">Result Type is required</Text>}
+                    <TextInput
+                        placeholder="Enter the return type (e.g., int, int*, float)"
+                        value={resultType}
+                        onChange={(e) => setResultType(e.target.value)}
+                        mb="md"
+                        w={"30vw"}
+                    />
+
+                    {/* Author */}
                     <Text>Author</Text>
                     {authorErr && <Text color="red">Author is required</Text>}
                     <TextInput
@@ -149,6 +202,7 @@ export default function CreateProblem() {
                         w={"30vw"}
                     />
 
+                    {/* Description */}
                     <Text>Description</Text>
                     {descriptionErr && <Text color="red">Description is required</Text>}
                     <Textarea
@@ -160,8 +214,9 @@ export default function CreateProblem() {
                         w={"50vw"}
                     />
 
+                    {/* Solution Constraints */}
                     <Text>Solution Constraints</Text>
-                    {constraintsErr && <Text color="red">Must have at least 1 constraint</Text>}
+                    {constraints.length === 0 && <Text color="gray">Optional: add any constraints your solution must satisfy.</Text>}
                     {constraints.map((constraint, index) => (
                         <Group key={index} mt="xs">
                             <TextInput
@@ -178,7 +233,7 @@ export default function CreateProblem() {
                                 color="red"
                                 variant="outline"
                                 onClick={() => setConstraints(constraints.filter((_, i) => i !== index))}
-                                disabled={constraints.length === 1}
+                                disabled={constraints.length === 0}
                             >
                                 <IconTrash size={18} />
                             </ActionIcon>
@@ -188,8 +243,9 @@ export default function CreateProblem() {
                         Add Constraint
                     </Button>
 
+                    {/* Function Arguments */}
                     <Text>Function Arguments</Text>
-                    {argsErr && <Text color="red">Must have at least 1 argument given to the function</Text>}
+                    {argsErr && <Text color="red">At least 1 function argument is required</Text>}
                     {args.map((arg, index) => (
                         <Group key={index} mt="xs">
                             <TextInput
@@ -216,13 +272,14 @@ export default function CreateProblem() {
                         Add Function Argument
                     </Button>
 
+                    {/* Examples */}
                     <Text>Examples</Text>
-                    {examplesErr && <Text c="red">Each example must have values for all arguments and an output</Text>}
+                    {examplesErr && <Text color="red">Each example must have values for all arguments and an output</Text>}
                     {examples.map((example, exIndex) => (
                         <Group key={exIndex} direction="column" p="md" mb="md" display="block" style={{ border: '1px solid #ccc', borderRadius: '4px' }}>
                             <Title order={4} mt="xs">Example {exIndex + 1}</Title>
                             {args.map((arg, cIndex) => (
-                                <Group key={cIndex} mt="xs" align="flex-end" ml={"md"}>
+                                <Group key={cIndex} mt="xs" align="flex-end" ml="md">
                                     <Text size="sm" weight={500} style={{ width: "5vw", textAlign: "center" }}>
                                         {arg ? arg.toUpperCase() : "ARG"}
                                     </Text>
@@ -250,7 +307,7 @@ export default function CreateProblem() {
                                     setExamples(newExamples);
                                 }}
                                 w={"30vw"}
-                                ml={"md"}
+                                ml="md"
                                 mt="xs"
                             />
                             <Button
@@ -272,10 +329,11 @@ export default function CreateProblem() {
                         Add Example
                     </Button>
 
+                    {/* Default Code */}
                     <Text mt={20}>Default Code</Text>
                     {defaultCodeErr && <Text color="red">Default code is required</Text>}
                     <Editor
-                        height="300px"
+                        height={"300px"}
                         theme="vs-dark"
                         defaultLanguage="c"
                         value={defaultCode}

@@ -37,13 +37,101 @@ export default function ProblemPage() {
         return Math.max(cpuPoints + gpuPoints, 0);
     }
 
+    // const runTestCases = async () => {
+
+    //     const testPromises = prob.examples.map((example, index) => {
+    //         // Build a structured test case array where each input contains name, type, and value
+    //         const structuredInputs = example.inputs.map(inp => {
+    //             return {
+    //                 name: inp.name,
+    //                 type: inp.type || "int",
+    //                 // If inp.value is a string starting with "[" assume it's an array in string form,
+    //                 // and try to parse it, otherwise leave it as is
+    //                 value: typeof inp.value === "string" && inp.value.trim().startsWith("[")
+    //                     ? JSON.parse(inp.value)
+    //                     : inp.value
+    //             };
+    //         });
+
+    //         const testPayload = {
+    //             code: code,
+    //             functionName: prob.functionName,
+    //             resultType: prob.resultType,
+    //             testCase: structuredInputs,
+    //             output: example.output
+    //         };
+
+    //         return fetch("http://localhost:1739/run_test", {
+    //             method: "POST",
+    //             headers: {
+    //                 "Content-Type": "application/json",
+    //             },
+    //             body: JSON.stringify(testPayload),
+    //         })
+    //             .then(response => response.json())
+    //             .then(data => {
+    //                 console.log(`Test case ${index + 1} response:`, data);
+
+    //                 if (data.passed === true) {
+    //                     notifications.show({
+    //                         title: `Test Case ${index + 1} passed`,
+    //                         message: "Test passed",
+    //                         color: "green",
+    //                         autoClose: 1000,
+    //                     });
+    //                     return true;
+    //                 } else {
+    //                     notifications.show({
+    //                         title: `Test Case ${index + 1} failed`,
+    //                         message: "Your solution did not pass this test case",
+    //                         color: "red",
+    //                         autoClose: 2000,
+    //                     });
+    //                     return false;
+    //                 }
+    //             })
+    //             .catch((error) => {
+    //                 notifications.show({
+    //                     title: `Test Case ${index + 1} error`,
+    //                     message: "Error executing test case",
+    //                     color: "red",
+    //                     autoClose: 2000,
+    //                 });
+    //                 return false;
+    //             });
+    //     });
+
+    //     // Wait for all test case promises to complete
+    //     const testResults = await Promise.all(testPromises);
+    //     console.log("Test results:", testResults);
+
+    //     // If every test returned true then all passed
+    //     return testResults.every(result => result === true);
+    // };
+
     const runTestCases = async () => {
         const testPromises = prob.examples.map((example, index) => {
-            const body = {
+            // Build a structured "inputs" array for this test case.
+            const structuredInputs = example.inputs.map(inp => {
+                return {
+                    name: inp.name,
+                    type: inp.type || "int",
+                    // If inp.value is a string starting with "[" assume it's JSON
+                    value: (typeof inp.value === "string" && inp.value.trim().startsWith("["))
+                        ? JSON.parse(inp.value)
+                        : inp.value
+                };
+            });
+
+            // Build the test case object with both inputs and output
+            const testCasePayload = {
                 code: code,
-                functionName: prob.slugTitle,
-                testCase: example.inputs,
-                output: example.output,
+                functionName: prob.functionName,
+                resultType: prob.resultType,
+                testCase: {
+                    inputs: structuredInputs,
+                    output: example.output
+                }
             };
 
             return fetch("http://localhost:1739/run_test", {
@@ -51,10 +139,11 @@ export default function ProblemPage() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(body),
+                body: JSON.stringify(testCasePayload),
             })
-                .then((response) => response.json())
-                .then((data) => {
+                .then(response => response.json())
+                .then(data => {
+                    console.log(`Test case ${index + 1} response:`, data);
                     if (data.passed === true) {
                         notifications.show({
                             title: `Test Case ${index + 1} passed`,
@@ -86,20 +175,18 @@ export default function ProblemPage() {
 
         // Wait for all test case promises to complete
         const testResults = await Promise.all(testPromises);
-        // If every test returned true then all passed
-        return testResults.every((result) => result === true);
+        console.log("Test results:", testResults);
+        return testResults.every(result => result === true);
     };
 
     const checkSolution = async () => {
         setTestCasesPassed(false);
 
-        // 1 Check if code is valid solution based on test cases
+        // Run test cases; only proceed if all pass.
         const allCasesPassed = await runTestCases();
         console.log("All test cases ran");
 
-        // If any test case fails, return false
         if (!allCasesPassed) {
-            // Notify user and stop submission
             notifications.show({
                 title: "Submission halted",
                 message: "One or more test cases failed.",
@@ -109,7 +196,6 @@ export default function ProblemPage() {
             return; // Stop further processing
         }
 
-        // All test cases passed, continue with the submission process
         notifications.show({
             title: "All test cases passed",
             message: "Compiling your code...",
@@ -117,8 +203,10 @@ export default function ProblemPage() {
             autoClose: 1000,
         });
 
-        // 2 If valid, send to server for compilation
-        fetch("https://optimizer-service-205616280235.us-central1.run.app/check", {
+        console.log(probID);
+
+
+        fetch("http://localhost:1738/check", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -130,13 +218,15 @@ export default function ProblemPage() {
                 probID: probID
             })
         })
-            .then((response) => {
+            .then(response => {
                 if (!response.ok) {
                     console.log(response);
+                    // } else {
                 }
                 return response.text();
             })
-            .then((data) => {
+            .then(data => {
+                // if (data === undefined) return;
                 console.log("Response data:", data);
                 let cpu_metric = Math.floor(Math.random() * 100);
                 let gpu_metric = Math.floor(Math.random() * 100);
@@ -146,26 +236,24 @@ export default function ProblemPage() {
                 let score = calculateScore(cpu_metric, gpu_metric);
                 console.log("Score:", score);
 
-                // 3 If compilation successful, send to server for tracking
                 trackSolution(uid, prob.id, {
                     code: code,
                     finished: true,
                     probid: prob.id,
                     uid: uid,
                     score: score,
-                    // Generate random numbers for metrics for now
                     cpu_metric: cpu_metric,
                     gpu_metric: gpu_metric,
                 })
                     .then(() => {
                         notifications.show({
-                            title: 'Code compiled successfully!',
+                            title: "Code compiled successfully!",
                             color: "green",
                             autoClose: 2000,
-                        })
-                    })
+                        });
+                    });
             });
-    }
+    };
 
     useEffect(() => {
         getProblemBySlug(ptitle).then((prob) => {
