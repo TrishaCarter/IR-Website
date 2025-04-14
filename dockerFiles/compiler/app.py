@@ -32,6 +32,7 @@ def check():
         testing_c_path = os.path.join(repo_path, "testing.c")
         with open(testing_c_path, "w") as f:
             f.write(code)
+            print(code)
 
         if cuda:
             proc = subprocess.Popen(

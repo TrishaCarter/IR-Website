@@ -112,11 +112,19 @@ def run_tests():
             tc_expected = str(data.get("output", "")).strip()
         main_code = generate_main(inputs, function_name, result_type)
         combined_code = user_code + "\n" + main_code
+
+        print("Main")
+        print(main_code)
+
+
+        print("OIEJHFPIOSFJPIESUF")
+        print(combined_code)
         
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_file_path = os.path.join(temp_dir, "solution.c")
             executable_path = os.path.join(temp_dir, "temp_program")
             with open(temp_file_path, "w") as temp_file:
+                temp_file.truncate(0)
                 temp_file.write(combined_code)
             compile_res = subprocess.run(
                 ["gcc", temp_file_path, "-o", executable_path],
@@ -140,7 +148,7 @@ def run_tests():
             overall_pass = False
         results.append({"passed": pass_case, "results": prog_out, "expected": tc_expected})
     if overall_pass:
-        return jsonify({"passed": True, "results": results}), 200
+        return jsonify({"passed": True, "results": results, "code": combined_code}), 200
     else:
         return jsonify({"passed": False, "results": results}), 200
 

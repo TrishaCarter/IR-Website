@@ -106,6 +106,7 @@ export default function ProblemPage() {
     // };
 
     const runTestCases = async () => {
+        let combinedCode = null;
         const testPromises = prob.examples.map((example, index) => {
             // Build a structured "inputs" array for this test case.
             const structuredInputs = example.inputs.map(inp => {
@@ -139,6 +140,7 @@ export default function ProblemPage() {
             })
                 .then(response => response.json())
                 .then(data => {
+                    combinedCode = data.code;
                     console.log(`Test case ${index + 1} response:`, data);
                     if (data.passed === true) {
                         notifications.show({
@@ -172,15 +174,20 @@ export default function ProblemPage() {
         // Wait for all test case promises to complete
         const testResults = await Promise.all(testPromises);
         console.log("Test results:", testResults);
-        return testResults.every(result => result === true);
+        return {
+            passed: testResults.every(result => result === true),
+            code: combinedCode
+        };
     };
 
     const checkSolution = async () => {
         // Run test cases; only proceed if all pass.
-        const allCasesPassed = await runTestCases();
+        const results = await runTestCases();
         console.log("All test cases ran");
+        console.log(results.passed);
 
-        if (!allCasesPassed) {
+
+        if (!results.passed) {
             notifications.show({
                 title: "Submission halted",
                 message: "One or more test cases failed.",
@@ -198,6 +205,7 @@ export default function ProblemPage() {
         });
 
         console.log(probID);
+        console.log(results.code);
 
 
         fetch("http://localhost:1738/check", {
@@ -206,7 +214,7 @@ export default function ProblemPage() {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                code: code,
+                code: results.code,
                 user: auth.currentUser?.uid,
                 cuda: false,
                 probID: probID
@@ -240,6 +248,7 @@ export default function ProblemPage() {
                     .then(() => {
                         notifications.show({
                             title: "Code compiled successfully!",
+                            message: `Score: ${score}`,
                             color: "green",
                             autoClose: 2000,
                         });

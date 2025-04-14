@@ -37,4 +37,4 @@ WORKDIR /app
 EXPOSE 1738
 
 # Run the Flask app using Gunicorn
-CMD ["gunicorn", "--log-level", "debug", "--workers", "3", "--bind", "0.0.0.0:1738", "app:app"]
+CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:1738", "app:app"]
