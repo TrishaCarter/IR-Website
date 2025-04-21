@@ -49,7 +49,10 @@ export default function Navbar() {
     return (
         <Flex justify={"space-between"} align={"center"} w={"100%"} p={"lg"} h={"10vh"} style={{ background: theme.secondaryBackground }}>
             <Group>
-                <Text c={theme.primaryTextColor}>Logo</Text>
+                <Text
+                    c={theme.primaryTextColor}
+                    onClick={() => router.push("/dashboard")}
+                >Logo</Text>
                 <Space w={"lg"} />
                 <Anchor href={"/dashboard"} style={{ color: theme.accentColor }}>Dashboard</Anchor>
                 <Anchor href={"/problems"} style={{ color: theme.accentColor }}>Problems</Anchor>
