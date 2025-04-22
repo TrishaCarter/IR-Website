@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { TextInput, PasswordInput, Button, Switch, Group, Box, Title, Avatar, FileButton, Center } from '@mantine/core';
-import { auth, uploadProfilePic } from '../../firebase';
+import { auth, updateUserProfilePic, uploadProfilePic } from '../../firebase';
 import { updatePassword } from 'firebase/auth';
 import Navbar from "../../components/Navbar";
 import { useRouter } from 'next/router';
@@ -46,7 +46,8 @@ export default function AccountSettings() {
     const handleUpdateProfile = async () => {
         try {
             console.log("FILE:", avatar);
-            await uploadProfilePic(avatar, auth.currentUser?.uid);
+            let downloadURL = await uploadProfilePic(avatar, auth.currentUser?.uid);
+            await updateUserProfilePic(auth.currentUser?.uid, downloadURL);
             alert("Profile picture updated successfully!");
             console.log(auth.currentUser.photoURL);
 
@@ -58,6 +59,8 @@ export default function AccountSettings() {
 
     const handleImageUpload = async (e) => {
         const selected = e.target.files[0];
+        console.log("SELECTED:", selected);
+
         setPreview(URL.createObjectURL(selected));
         setAvatar(selected);
     }
@@ -72,8 +75,6 @@ export default function AccountSettings() {
             alert('Error updating password: ' + error.message);
         }
     };
-
-    useEffect(() => { console.log(avatar) }, [avatar])
 
     return (
         <>

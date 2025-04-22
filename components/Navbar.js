@@ -8,25 +8,22 @@ export default function Navbar() {
     let [user, setUser] = useState(null);
     let [avatar, setAvatar] = useState('');
 
-    // useEffect(() => {
-    //     let getUser = async () => {
-    //         let userData = await auth.currentUser;
-
-    //         if (userData == null) {
-    //             console.log("No user logged in");
-    //             router.push("/login")
-    //             return;
-    //         }
-    //         console.log(userData);
-    //         setUser(userData);
-    //     }
-
-    //     getUser();
-    // }, [])
-
     useEffect(() => {
-        setAvatar(user?.photoURL || '');
-    }, [user]);
+        let getUser = async () => {
+            let userData = await auth.currentUser;
+
+            if (userData == null) {
+                console.log("No user logged in");
+                router.push("/login")
+                return;
+            }
+            console.log(userData);
+            setUser(userData);
+            setAvatar(userData.photoURL || '');
+        }
+
+        getUser();
+    }, [])
 
     let theme = {
         background: '#16171b',

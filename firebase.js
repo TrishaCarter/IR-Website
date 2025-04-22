@@ -55,6 +55,7 @@ export let getUserDoc = async (uid) => {
     }
 }
 
+// For putting image in Firebase Storage
 export const uploadProfilePic = async (file, uid) => {
     if (!file || !file.name) throw new Error("Invalid file input");
 
@@ -63,6 +64,12 @@ export const uploadProfilePic = async (file, uid) => {
 
     await uploadBytes(profilePicRef, file);
     return getDownloadURL(profilePicRef);
+};
+
+// For putting ^^ image in Firestore 
+export const updateUserProfilePic = async (uid, url) => {
+    const userRef = doc(db, 'USERS', uid);
+    await setDoc(userRef, { photoURL: url }, { merge: true });
 };
 
 export let getAllProblems = async () => {
