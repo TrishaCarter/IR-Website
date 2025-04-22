@@ -10,6 +10,7 @@ import {
     addDoc, query, where,
     updateDoc, increment
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -53,6 +54,16 @@ export let getUserDoc = async (uid) => {
         return null;
     }
 }
+
+export const uploadProfilePic = async (file, uid) => {
+    if (!file || !file.name) throw new Error("Invalid file input");
+
+    const storage = getStorage();
+    const profilePicRef = ref(storage, `profile_pictures/${uid}`);
+
+    await uploadBytes(profilePicRef, file);
+    return getDownloadURL(profilePicRef);
+};
 
 export let getAllProblems = async () => {
     let problems = [];
