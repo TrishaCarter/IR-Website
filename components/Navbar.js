@@ -1,4 +1,4 @@
-import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar } from "@mantine/core"
+import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar, Box, Divider } from "@mantine/core"
 import { useEffect, useState } from "react";
 import { auth, getUserDoc } from "../firebase";
 import { useRouter } from "next/router";
@@ -34,6 +34,13 @@ export default function Navbar() {
         accentColor: '#629C44',
     }
 
+    let dropdownBoxStyle = {
+        background: theme.secondaryBackground,
+        color: theme.primaryTextColor,
+        padding: '10px',
+        borderRadius: '5px',
+    }
+
     let handleLogout = async () => {
         try {
             await auth.signOut();
@@ -59,21 +66,25 @@ export default function Navbar() {
                 transitionProps={{ transition: 'pop-top-right' }}
                 position="top-end"
                 width={220}
-                withinPortal
+                withinPortal={false}
+
             >
                 <Menu.Target>
                     <Avatar src={avatar} size={30} m={0} />
                 </Menu.Target>
-                <Menu.Dropdown>
-                    <Menu.Item>
-                        <Anchor href={"/profile"} c={theme.accentColor}>Profile</Anchor>
-                    </Menu.Item>
-                    <Menu.Item>
+                <Menu.Dropdown w={130} bg={theme.secondaryBackground} style={{ borderRadius: '10px' }} bd={`1px solid ${theme.secondaryTextColor}`}>
+                    <Box style={dropdownBoxStyle} onClick={() => router.push("/profile")}>
+                        <Text c={theme.accentColor}>Profile</Text>
+                    </Box>
+                    <Divider />
+                    <Box style={dropdownBoxStyle}>
+
                         <Anchor href={"/settings"} c={theme.accentColor}>Settings</Anchor>
-                    </Menu.Item>
-                    <Menu.Item onClick={handleLogout} variant="light" c={"red"}>
-                        Log Out
-                    </Menu.Item>
+                    </Box>
+                    <Divider />
+                    <Box style={dropdownBoxStyle}>
+                        <Anchor onClick={handleLogout} variant="light" c={"red"}>Log Out</Anchor>
+                    </Box>
                 </Menu.Dropdown>
             </Menu>
         </Flex>
