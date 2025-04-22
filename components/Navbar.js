@@ -1,6 +1,6 @@
 import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar } from "@mantine/core"
 import { useEffect, useState } from "react";
-import { auth } from "../firebase";
+import { auth, getUserDoc } from "../firebase";
 import { useRouter } from "next/router";
 
 export default function Navbar() {
@@ -11,15 +11,16 @@ export default function Navbar() {
     useEffect(() => {
         let getUser = async () => {
             let userData = await auth.currentUser;
+            let userDoc = await getUserDoc(userData.uid);
 
             if (userData == null) {
                 console.log("No user logged in");
                 router.push("/login")
                 return;
             }
-            console.log(userData);
-            setUser(userData);
-            setAvatar(userData.photoURL || '');
+
+            setUser(auth.currentUser);
+            setAvatar(userDoc.photoURL || null);
         }
 
         getUser();
@@ -68,7 +69,7 @@ export default function Navbar() {
                         <Anchor href={"/profile"} c={theme.accentColor}>Profile</Anchor>
                     </Menu.Item>
                     <Menu.Item>
-                        <Anchor href={"/account-settings"} c={theme.accentColor}>Settings</Anchor>
+                        <Anchor href={"/settings"} c={theme.accentColor}>Settings</Anchor>
                     </Menu.Item>
                     <Menu.Item onClick={handleLogout} variant="light" c={"red"}>
                         Log Out

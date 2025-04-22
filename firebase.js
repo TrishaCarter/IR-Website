@@ -72,6 +72,8 @@ export const updateUserProfilePic = async (uid, url) => {
     await setDoc(userRef, { photoURL: url }, { merge: true });
 };
 
+
+
 export let getAllProblems = async () => {
     let problems = [];
     let problemsRef = collection(db, 'PROBLEMS');
