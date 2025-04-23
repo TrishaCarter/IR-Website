@@ -1,6 +1,7 @@
 import { Title, Text, Container, Flex, TextInput, Grid, Card, Stack, Group, Button } from "@mantine/core"
 import { getAllProblems } from "@/firebase"
 import { useContext, useEffect, useState } from "react"
+import { AuthContext } from "../_app"
 import Link from "next/link"
 import Navbar from "../../components/Navbar";
 import { auth, getUserSolutions } from "../../firebase";
@@ -22,7 +23,7 @@ export default function ProblemHomepage() {
     }
     const { user, loading } = useContext(AuthContext);
     useEffect(() => {
-        if (!authLoading && !user) {
+        if (!loading && !user) {
             router.push('/login');
         }
         // Wait for both promises to resolve before trying to filter. 
@@ -57,7 +58,7 @@ export default function ProblemHomepage() {
                 console.log("Finished", finishedArr);
             })
             .catch(err => console.error(err));
-    }, [user, authLoading]);
+    }, [user, loading]);
 
 
     // Filter each group by the search term
