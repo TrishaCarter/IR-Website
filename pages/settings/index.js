@@ -69,6 +69,16 @@ export default function AccountSettings() {
         }
     };
 
+    const handleUpdateEmail = async () => {
+        updateEmail(auth.currentUser, "user@example.com").then(() => {
+            // Email updated!
+            // ...
+        }).catch((error) => {
+            // An error occurred
+            // ...
+        });
+    }
+
     const handleUpdateProfile = async () => {
         try {
             if (avatarChanged) {
@@ -79,9 +89,17 @@ export default function AccountSettings() {
             }
 
             if (usernameChanged) {
-                await
-                    alert("Username updated successfully!");
+                alert("Username updating not in place yet")
             }
+
+            if (emailChanged) {
+                updateEmail(auth.currentUser, email).then(() => {
+                    alert("Email updated successfully!");
+                }).catch((error) => {
+                    alert("Error updating email: " + error.message);
+                });
+            }
+
         } catch (error) {
             console.log(error);
 
@@ -101,8 +119,8 @@ export default function AccountSettings() {
                             {(props) => <Button {...props} >Upload image</Button>}
                         </FileButton>
                     </Center>
-                    < TextInput label="Username" value={username} onChange={(e) => setUsername(e.target.value)} mb="sm" size="md" />
-                    <TextInput label="Email" value={email} disabled mb="sm" size="md" />
+                    <TextInput label="Username" disabled value={username} onChange={(e) => setUsername(e.target.value)} mb="sm" size="md" />
+                    <TextInput label="Email" value={email} onChange={(e) => setEmail(e.target.value)} mb="sm" size="md" />
                     <PasswordInput label="New Password" value={password} onChange={(e) => setPassword(e.target.value)} mb="lg" size="md" />
                     <Group position="apart" mt="xl" >
                         <Button onClick={handleUpdateProfile} size="xl" > Save Changes </Button>
