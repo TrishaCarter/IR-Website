@@ -1,8 +1,9 @@
 # Stage 1: Build and Setup
-FROM alpine:latest
+FROM ubuntu
 
 # Install build dependencies
-RUN apk update && apk add --no-cache git build-base curl tar python3 py3-pip gcc linux-tools
+RUN apt update && apt install -y git build-essential curl tar python3 python3-pip gcc linux-tools-generic
+#  nvidia-cuda-toolkit 
 
 WORKDIR /app
 
@@ -17,7 +18,7 @@ WORKDIR /app
 #     make -C rule_based_engine clean && \
 #     make -C rule_based_engine install
 
-RUN git clone https://github.com/Unkomon9/C_DeezNuts_Source_Code.git
+RUN git clone https://github.com/Unkomon9/RBE_Preprocess.git
 
 # Install Python dependencies (if you have a requirements.txt)
 COPY requirements.txt /app/requirements.txt
@@ -36,4 +37,4 @@ WORKDIR /app
 EXPOSE 1738
 
 # Run the Flask app using Gunicorn
-CMD ["gunicorn", "--log-level", "debug", "--workers", "3", "--bind", "0.0.0.0:1738", "app:app"]
+CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:1738", "app:app"]

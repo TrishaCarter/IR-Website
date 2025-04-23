@@ -114,12 +114,12 @@ export default function ProblemHomepage() {
         </Grid>
     );
 
-    return <Flex w={"100vw"} mh={"100vh"} m={0} direction={"column"} align={"center"}
+    return <Flex w={"100vw"} minh={"100vh"} m={0} direction={"column"} align={"center"}
         style={{ backgroundColor: theme.background, color: theme.primaryTextColor }}
     >
         <Navbar />
 
-        <Container size="xl" py="xl">
+        <Container size="xl" py="xl" mih={"90vh"}>
             <Title order={2} mb="md" ta={"center"}>
                 All Problems
             </Title>

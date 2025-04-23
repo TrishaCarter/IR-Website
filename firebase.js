@@ -7,7 +7,8 @@ import {
     getFirestore, doc,
     getDoc, setDoc,
     collection, getDocs,
-    addDoc, query, where
+    addDoc, query, where,
+    updateDoc, increment
 } from "firebase/firestore";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -92,21 +93,33 @@ export let createProblem = async (data) => {
 export let trackSolution = async (uid, problemId, data) => {
 
     // Check if solution for uid/problemID combo exists
-    const q = query(collection(db, `SOLUTIONS`), where('problemId', '==', problemId), where('uid', '==', uid));
+    const q = query(collection(db, `SOLUTIONS`), where('probid', '==', problemId), where('uid', '==', uid));
     const snapshot = await getDocs(q);
 
     // If solution instance exists, update it
     if (!snapshot.empty) {
-        snapshot.forEach(async (doc) => {
-            await setDoc(doc.ref, data, { merge: true });
-            console.log(`Solution for problem ${problemId} updated for user ${uid}`);
-        });
+        const existingDoc = snapshot.docs[0];
+        const existingScore = existingDoc.data().score || 0;
+
+        if (data.score > existingScore) {
+            // Calculate how many additional points to give.
+            const scoreDiff = data.score - existingScore;
+            // Update the solution to reflect the new best attempt.
+            if (scoreDiff > 0) await setDoc(existingDoc.ref, data, { merge: true });
+            // Update the user's currency with the additional points.
+            await updateUserScore(uid, scoreDiff);
+            console.log(`New high score for problem ${problemId} from user ${uid}: +${scoreDiff} points.`);
+        } else {
+            // New submission is not better than the existing solution.
+            console.log("User's submission did not improve over previous best; no reward given.");
+        }
 
         return;
     } else {
         // If solution instance does not exist, create it
         try {
             let docRef = await addDoc(collection(db, "SOLUTIONS"), data);
+            await updateUserScore(uid, data.score);
             console.log(`Solution for problem ${problemId} tracked with ID ${docRef.id}`);
 
         } catch (error) {
@@ -127,4 +140,40 @@ export let getUserSolutions = async (uid) => {
     }
 }
 
+<<<<<<< HEAD
 export default app;
+=======
+export let getProblemSolutions = async (problemId) => {
+    const q = query(collection(db, 'SOLUTIONS'), where('probid', '==', problemId));
+    const snapshot = await getDocs(q);
+
+    if (!snapshot.empty) {
+        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    } else {
+        console.log(`No solutions found for problem ${problemId}`);
+        return [];
+    }
+}
+
+export let getUserById = async (uid) => {
+    let docRef = doc(db, 'USERS', uid);
+    let docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        return docSnap.data();
+    } else {
+        console.log("No such document!");
+        return null;
+    }
+}
+
+export let updateUserScore = async (uid, score) => {
+    const userDocRef = doc(db, 'USERS', uid);
+    // Increment the user's currency balance by the score.
+    await updateDoc(userDocRef, {
+        currency: increment(score),
+    });
+}
+
+export default app;
+>>>>>>> b560ca00c68cb9e521bcfe8e9da167568e9305e5
