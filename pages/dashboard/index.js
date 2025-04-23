@@ -1,9 +1,10 @@
 
 import { Flex, Title, Grid, Overlay } from "@mantine/core"
 import { auth, db } from "../../firebase"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { doc, setDoc, getDoc } from "firebase/firestore"
+import { AuthContext } from "../_app"
 import Navbar from "../../components/Navbar";
 import UserProgress from "../../components/dashboard/UserProgress";
 import TrendingProblems from "../../components/dashboard/TrendingProblems";
@@ -14,7 +15,6 @@ import OnboardingModals from "../../components/Onboarding"
 
 export default function DashboardPage() {
     let router = useRouter();
-    let [user, setUser] = useState(null);
     let [needOnboard, setNeedOnboard] = useState(false);
 
     let theme = {
@@ -25,29 +25,18 @@ export default function DashboardPage() {
         accentColor: '#629C44',
     }
 
+    const { user, loading } = useContext(AuthContext);
+
     useEffect(() => {
-        let getUser = async () => {
-            let userData = auth.currentUser;
-            console.log("Current user: ");
-            console.log(userData);
-
-            if (userData == null) {
-                console.log("No user logged in");
-                router.push("/login")
-                return;
-            }
-
-            setUser(userData);
+        if (!loading && !user) {
+            router.push('/login');
         }
-
-        getUser();
-
         const userRef = doc(db, "USERS", auth.currentUser.uid);
         getDoc(userRef).then((doc) => {
             let info = doc.data();
             ("favoriteLanguages" in info) ? setNeedOnboard(false) : setNeedOnboard(true);
         })
-    }, [])
+    }, [user, loading])
 
     let finishOnboarding = (username, skills, favoriteLanguages) => {
         let userRef = doc(db, "USERS", auth.currentUser.uid);

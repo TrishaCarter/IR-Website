@@ -37,7 +37,7 @@ export default function App({ Component, pageProps }) {
 }
 
 // Create Auth Context
-const AuthContext = createContext();
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         // Listen for user authentication state changes
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
+            setUser(user || null);
             setLoading(false);
         });
 

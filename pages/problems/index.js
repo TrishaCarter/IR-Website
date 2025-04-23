@@ -1,6 +1,6 @@
 import { Title, Text, Container, Flex, TextInput, Grid, Card, Stack, Group, Button } from "@mantine/core"
 import { getAllProblems } from "@/firebase"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import Link from "next/link"
 import Navbar from "../../components/Navbar";
 import { auth, getUserSolutions } from "../../firebase";
@@ -20,11 +20,14 @@ export default function ProblemHomepage() {
         secondaryTextColor: '#aaaaaa',
         accentColor: '#629C44',
     }
-
+    const { user, loading } = useContext(AuthContext);
     useEffect(() => {
-        const userId = auth.currentUser.uid;
+        if (!authLoading && !user) {
+            router.push('/login');
+        }
         // Wait for both promises to resolve before trying to filter. 
         // A problem came up where both states were not updating in a proper time to filter correctly.
+        const userId = auth.currentUser.uid;
         Promise.all([getAllProblems(), getUserSolutions(userId)])
             .then(([allProblems, userSolutions]) => {
                 setProblems(allProblems);
@@ -54,7 +57,7 @@ export default function ProblemHomepage() {
                 console.log("Finished", finishedArr);
             })
             .catch(err => console.error(err));
-    }, []);
+    }, [user, authLoading]);
 
 
     // Filter each group by the search term
