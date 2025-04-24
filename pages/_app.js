@@ -5,7 +5,7 @@ import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
 import { useState, useEffect, createContext, useContext } from "react";
 import { auth } from "@/firebase"; // Import auth from your Firebase setup
-import { onAuthStateChanged } from "firebase/auth";
+import { browserSessionPersistence, onAuthStateChanged, setPersistence } from "firebase/auth";
 import { Notifications } from '@mantine/notifications';
 
 
@@ -38,7 +38,6 @@ export default function App({ Component, pageProps }) {
 
 // Create Auth Context
 export const AuthContext = createContext();
-
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
