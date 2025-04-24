@@ -11,11 +11,14 @@ import TrendingProblems from "../../components/dashboard/TrendingProblems";
 import LeaderboardSpot from "../../components/LeaderboardSpot";
 import UserBadges from "../../components/dashboard/UserBadges";
 import OnboardingModals from "../../components/Onboarding"
+import { getProblemsWithSolutionCounts } from "../../queries"
 
 
 export default function DashboardPage() {
     let router = useRouter();
     let [needOnboard, setNeedOnboard] = useState(false);
+    let [userInfo, setUserInfo] = useState(null);
+    let [sortedProblems, setSortedProblems] = useState([]);
 
     let theme = {
         background: '#16171b',
@@ -25,15 +28,17 @@ export default function DashboardPage() {
         accentColor: '#629C44',
     }
 
+    // Route guarding useEffect
     const { user, loading } = useContext(AuthContext);
-
     useEffect(() => {
         if (!loading && !user) {
             router.push('/login');
         }
+
         const userRef = doc(db, "USERS", auth.currentUser.uid);
         getDoc(userRef).then((doc) => {
             let info = doc.data();
+            setUserInfo(info);
             ("favoriteLanguages" in info) ? setNeedOnboard(false) : setNeedOnboard(true);
         })
     }, [user, loading])
@@ -58,7 +63,7 @@ export default function DashboardPage() {
 
         <Navbar />
         <Flex direction="column" align="center" w="100vw" h="90vh " style={{ backgroundColor: theme.background }} pt={15}>
-            <Title order={1} mb={20} c={theme.primaryTextColor}>Welcome back{user ? `, ${user.displayName}!` : "!"}</Title>
+            <Title order={1} mb={20} c={theme.primaryTextColor}>Welcome back{userInfo ? `, ${userInfo.displayName}!` : "!"}</Title>
             <Grid columns={2} gap={20}>
                 <Grid.Col span={1}>
                     <UserProgress />
