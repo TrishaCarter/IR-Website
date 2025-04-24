@@ -2,13 +2,27 @@ runtime: nodejs20
 env: standard
 entrypoint: npm start
 
+build_env_variables:
+  NODE_ENV: "production"
+  USE_NPM: "true"
+  NPM_CONFIG_PRODUCTION: "false"  # Allow dev dependencies during build
+  SKIP_YARN_COREPACK: "true"
+  GOOGLE_SKIP_YARN: "true"
+
 env_variables:
-  NODE_ENV: production
-  NPM_CONFIG_PRODUCTION: true
+  NODE_ENV: "production"
+  NPM_CONFIG_PRODUCTION: "true"  # Runtime will still be production-only
+
+instance_class: F1
 
 automatic_scaling:
   target_cpu_utilization: 0.65
   target_throughput_utilization: 0.75
   max_instances: 2
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
 
 service_account: github-service@irwebsite-444921.iam.gserviceaccount.com

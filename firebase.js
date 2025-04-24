@@ -16,14 +16,14 @@ import {
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
-};
+    apiKey: "AIzaSyBlyXFWTShMuU40FRvjuTBHkXdazwTYdtw",
+    authDomain: "irwebsite-444921.firebaseapp.com",
+    projectId: "irwebsite-444921",
+    storageBucket: "irwebsite-444921.firebasestorage.app",
+    messagingSenderId: "205616280235",
+    appId: "1:205616280235:web:589884478a7fe6cce5fdee",
+    measurementId: "G-DY40GW5VW1"
+  };
 
 // Initialize Firebase
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
@@ -140,9 +140,6 @@ export let getUserSolutions = async (uid) => {
     }
 }
 
-<<<<<<< HEAD
-export default app;
-=======
 export let getProblemSolutions = async (problemId) => {
     const q = query(collection(db, 'SOLUTIONS'), where('probid', '==', problemId));
     const snapshot = await getDocs(q);
@@ -176,4 +173,3 @@ export let updateUserScore = async (uid, score) => {
 }
 
 export default app;
->>>>>>> b560ca00c68cb9e521bcfe8e9da167568e9305e5

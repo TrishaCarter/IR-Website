@@ -1,3 +1,39 @@
+# Exclude development and source control files
+.git
+.gitignore
+node_modules/
+.env
+.env.local
+.env*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Exclude test and development files
+__tests__
+*.test.js
+*.spec.js
+.eslintrc*
+.prettier*
+jest.config.*
+README.md
+
+# Exclude build artifacts
+.next/
+out/
+build/
+dist/
+
+# Exclude editor directories
+.idea/
+.vscode/
+
+# Exclude yarn configuration files
+.yarn/
+.yarnrc
+.yarnrc.yml
+yarn.lock
+
 # This file specifies files that are *not* uploaded to Google Cloud
 # using gcloud. It follows the same syntax as .gitignore, with the addition of
 # "#!include" directives (which insert the entries of the given .gitignore-style

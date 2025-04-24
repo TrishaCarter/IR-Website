@@ -214,32 +214,17 @@ export default function ProblemPage() {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-<<<<<<< HEAD
-                code: code,
-                user: auth.currentUser.uid
-=======
+
                 code: results.code,
                 user: auth.currentUser?.uid,
                 cuda: false,
                 probID: probID
->>>>>>> b560ca00c68cb9e521bcfe8e9da167568e9305e5
+
             })
         })
             .then(response => {
                 if (!response.ok) {
-<<<<<<< HEAD
-                    // throw new Error(`HTTP error ${response.status}: ${response.error}`);
-                    console.log(response);
 
-                }
-                let stuff = response.text();
-                return stuff; // Use .json() if your response is JSON
-            })
-            .then(data => {
-                console.log("Response data:", data);
-            })
-    }
-=======
                     console.log(response);
                     // } else {
                 }
@@ -273,7 +258,6 @@ export default function ProblemPage() {
                     });
             });
     };
->>>>>>> b560ca00c68cb9e521bcfe8e9da167568e9305e5
 
     useEffect(() => {
         getProblemBySlug(ptitle).then((prob) => {
