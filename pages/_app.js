@@ -44,13 +44,23 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Listen for user authentication state changes
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user || null);
-            setLoading(false);
-        });
+        const initializeAuth = async () => { // Create an async function
+            try {
+                await setPersistence(auth, browserSessionPersistence); // Set persistence
+                // Listen for user authentication state changes
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    setUser(user || null);
+                    setLoading(false);
+                });
 
-        return () => unsubscribe(); // Cleanup subscription
+                return () => unsubscribe(); // Cleanup subscription
+            } catch (error) {
+                console.error("Firebase Auth Persistence Error:", error);
+                setLoading(false); // Ensure loading is set to false even on error
+            }
+        };
+
+        initializeAuth();
     }, []);
 
     return (
