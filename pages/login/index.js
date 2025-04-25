@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Header, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
-import { setPersistence, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
+import { setPersistence, browserSessionPersistence, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider, db } from '../../firebase';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { loginUser } from '@/handlers';
@@ -46,6 +46,7 @@ export default function SignInPage() {
 
     let signInEmailPass = async () => {
         try {
+            await setPersistence(auth, browserSessionPersistence);
             let gAuth = await signInWithEmailAndPassword(auth, email, password);
             let uid = gAuth.user.uid;
 
@@ -83,6 +84,7 @@ export default function SignInPage() {
     let signInGoogle = async () => {
 
         try {
+            await setPersistence(auth, browserSessionPersistence);
             let gAuth = await signInWithPopup(auth, googleProvider);
             let uid = gAuth.user.uid;
 

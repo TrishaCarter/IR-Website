@@ -34,13 +34,16 @@ export default function DashboardPage() {
         if (!loading && !user) {
             router.push('/login');
         }
-        let uid = auth.currentUser.uid || null;
-        const userRef = doc(db, "USERS", uid);
-        getDoc(userRef).then((doc) => {
-            let info = doc.data();
-            setUserInfo(info);
-            ("favoriteLanguages" in info) ? setNeedOnboard(false) : setNeedOnboard(true);
-        })
+        let uid = auth.currentUser?.uid || null;
+
+        if (uid) {
+            const userRef = doc(db, "USERS", uid);
+            getDoc(userRef).then((doc) => {
+                let info = doc.data();
+                setUserInfo(info);
+                ("favoriteLanguages" in info) ? setNeedOnboard(false) : setNeedOnboard(true);
+            })
+        }
     }, [user, loading])
 
     let finishOnboarding = (username, skills, favoriteLanguages) => {

@@ -39,8 +39,8 @@ export default function UserBadges({ uid }) {
 
     useEffect(() => {
         getUserById(uid).then((user) => {
-            let achievedBadges = user.badges || [];
-            console.log(user.badges);
+            let achievedBadges = user?.badges || [];
+            console.log(user?.badges);
 
             setUserAchievedBadges(achievedBadges);
         })

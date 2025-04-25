@@ -173,6 +173,10 @@ export let getProblemSolutions = async (problemId) => {
 }
 
 export let getUserById = async (uid) => {
+    if (!uid) {
+        console.log("No UID provided");
+        return null;
+    }
     let docRef = doc(db, 'USERS', uid);
     let docSnap = await getDoc(docRef);
 

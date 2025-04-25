@@ -11,7 +11,9 @@ export default function Navbar() {
     useEffect(() => {
         let getUser = async () => {
             let userData = await auth.currentUser;
-            let userDoc = await getUserDoc(userData.uid);
+            if (userData) {
+                userDoc = await getUserDoc(userData.uid);
+            }
 
             if (userData == null) {
                 console.log("No user logged in");
