@@ -1,5 +1,5 @@
 
-import { Flex, Title, Grid, Overlay } from "@mantine/core"
+import { Flex, Title, Grid, Overlay, Text } from "@mantine/core"
 import { auth, db } from "../../firebase"
 import { useContext, useEffect, useState } from "react"
 import { useRouter } from "next/router"
@@ -34,8 +34,8 @@ export default function DashboardPage() {
         if (!loading && !user) {
             router.push('/login');
         }
-
-        const userRef = doc(db, "USERS", auth.currentUser.uid);
+        let uid = auth.currentUser.uid;
+        const userRef = doc(db, "USERS", uid);
         getDoc(userRef).then((doc) => {
             let info = doc.data();
             setUserInfo(info);
@@ -44,7 +44,7 @@ export default function DashboardPage() {
     }, [user, loading])
 
     let finishOnboarding = (username, skills, favoriteLanguages) => {
-        let userRef = doc(db, "USERS", auth.currentUser.uid);
+        let userRef = doc(db, "USERS", uid);
         setDoc(userRef, {
             username,
             skills,
@@ -62,12 +62,13 @@ export default function DashboardPage() {
         </> : null}
 
         <Navbar />
+
         <Flex direction="column" align="center" w="100vw" h="90vh " style={{ backgroundColor: theme.background }} pt={15}>
             <Title order={1} mb={20} c={theme.primaryTextColor}>Welcome back{userInfo ? `, ${userInfo.displayName}!` : "!"}</Title>
             <Grid columns={2} gap={20}>
                 <Grid.Col span={1}>
-                    <UserProgress />
-                    <LeaderboardSpot />
+                    {/* <UserProgress user={auth.currentUser.uid || null} /> */}
+                    <LeaderboardSpot uid={auth.currentUser?.uid} />
                     <UserBadges />
                 </Grid.Col>
                 <Grid.Col span={1}>
