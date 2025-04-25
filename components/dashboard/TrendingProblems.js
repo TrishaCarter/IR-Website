@@ -50,7 +50,7 @@ export default function TrendingProblems() {
                                 <Button px="5" w={"60px"} h={40} size="sm"
                                     bg={theme.accentColor}
                                     onClick={() => handleProbRedirect(problem.slugTitle)}
-                                >Open</Button>
+                                >Solve!</Button>
                             </Flex>
                         </Card>
                     </Group>

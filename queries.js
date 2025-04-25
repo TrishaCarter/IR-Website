@@ -10,6 +10,7 @@ import app from "./firebase";
 
 const db = getFirestore(app, "ir-website-db");
 
+// Get problems by # of solutions
 export let getProblemsWithSolutionCounts = async () => {
     const problemsSnapshot = await getDocs(collection(db, 'PROBLEMS'));
     const solutionsSnapshot = await getDocs(collection(db, 'SOLUTIONS'));
@@ -28,3 +29,4 @@ export let getProblemsWithSolutionCounts = async () => {
 
     return problemSolutionCounts;
 };
+
