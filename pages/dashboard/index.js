@@ -34,7 +34,7 @@ export default function DashboardPage() {
         if (!loading && !user) {
             router.push('/login');
         }
-        let uid = auth.currentUser.uid;
+        let uid = auth.currentUser.uid || null;
         const userRef = doc(db, "USERS", uid);
         getDoc(userRef).then((doc) => {
             let info = doc.data();
@@ -69,7 +69,7 @@ export default function DashboardPage() {
                 <Grid.Col span={1}>
                     {/* <UserProgress user={auth.currentUser.uid || null} /> */}
                     <LeaderboardSpot uid={auth.currentUser?.uid} />
-                    <UserBadges />
+                    <UserBadges uid={auth.currentUser?.uid} />
                 </Grid.Col>
                 <Grid.Col span={1}>
                     <TrendingProblems />
