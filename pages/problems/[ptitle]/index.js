@@ -6,10 +6,11 @@ import {
 import { RemoveScroll } from "react-remove-scroll";
 import { useRouter } from "next/router";
 import Navbar from "../../../components/Navbar";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { auth, getProblemBySlug, trackSolution, updateUserScore } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
 import { notifications } from '@mantine/notifications';
+import { AuthContext } from '../../_app';
 
 export default function ProblemPage() {
     let router = useRouter();
@@ -264,6 +265,13 @@ export default function ProblemPage() {
             setCode(prob.defaultCode);
         })
     }, [])
+
+    const { user, loading } = useContext(AuthContext);
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push('/login');
+        }
+    }, [user, loading])
 
     let theme = {
         background: "#16171b",
