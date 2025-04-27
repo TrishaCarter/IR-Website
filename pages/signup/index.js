@@ -7,6 +7,7 @@ import { loginUser } from '@/handlers';
 import { auth, googleProvider, db } from '../../firebase';
 import { useRouter } from 'next/router';
 import { notifications } from '@mantine/notifications';
+import Head from 'next/head';
 
 export default function SignInPage() {
     const router = useRouter();
@@ -108,6 +109,9 @@ export default function SignInPage() {
     }
 
     return <RemoveScroll>
+        <Head>
+            <title>Sign Up - Refactr</title>
+        </Head>
         <Center style={{ minHeight: '100vh', minWidth: '100vw', backgroundColor: theme.background }}>
             <Box sx={{ minWidth: 400, width: '100%', padding: 24, borderRadius: 8 }}>
                 {/* <Title order={1}>IR Website (Name tbd)</Title> */}
@@ -120,8 +124,9 @@ export default function SignInPage() {
                 {/* Google Sign In */}
                 <Button
                     miw={"100%"}
-                    bg={theme.accentColor}
-                    c={'white'}
+                    // bg={theme.accentColor}
+                    c={theme.accentColor}
+                    variant='outline'
                     // leftIcon={<IconBrandGoogle size={18} />}
                     mt="md"
                     radius="md"

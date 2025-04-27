@@ -11,8 +11,11 @@ export default function Navbar() {
     useEffect(() => {
         let getUser = async () => {
             let userData = await auth.currentUser;
-            if (userData) {
+            let userDoc;
+            try {
                 userDoc = await getUserDoc(userData.uid);
+            } catch (error) {
+                console.log("Error fetching user document:", error);
             }
 
             if (userData == null) {
@@ -21,8 +24,8 @@ export default function Navbar() {
                 return;
             }
 
-            setUser(auth.currentUser);
-            setAvatar(userDoc.photoURL || null);
+            setUser(auth.currentUser || null);
+            setAvatar(userDoc?.photoURL || null);
         }
 
         getUser();

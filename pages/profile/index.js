@@ -4,6 +4,7 @@ import Navbar from "../../components/Navbar"
 import { useRouter } from "next/router"
 import { auth, getUserDoc } from "../../firebase"
 import { useState, useEffect } from "react"
+import Head from "next/head"
 
 export default function Profile() {
     let router = useRouter()
@@ -81,75 +82,80 @@ export default function Profile() {
         ]
     }
 
-    return <Flex direction="column" align={"center"} h={"100vh"} c={theme.primaryTextColor} >
-        <Navbar />
-        <Grid grow columns={12} w={"100vw"} h={"90vh"} p={"lg"} bg={theme.background}>
-            <Grid.Col span={8}>
-                <Box style={boxStyling}>
-                    <Title align="center" order={3}>Problems</Title>
-                    <Space h="md" />
-                    <Divider />
-                    <Space h="md" />
-                    <Title order={3}>Unsolved Problems</Title>
-                    <Divider my={10} />
-                    {userInfo.curProblems.map((prob) => <>
-                        <Grid columns={12} w={"95%"} grow h={90}>
-                            <Grid.Col span={3}>
-                                <Flex justify={"center"} align={"center"} h={"100%"}>
-                                    <Text>{prob.name}</Text>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={6}>
-                                <Flex direction="column" align={"center"} w={"100%"}>
-                                    {prob.difficulty == "Easy" ?
-                                        <Badge color={theme.accentColor} m={8}>Easy</Badge> :
-                                        <Badge color={"red"} m={8}>Hard</Badge>
-                                    }
-                                    <Box>
-                                        {prob.tags.map((tag) => <Badge color={theme.accentColor} m={8} variant="light">{tag}</Badge>)}
-                                    </Box>
-                                </Flex>
-                            </Grid.Col>
-                            <Grid.Col span={1}>
-                                <Flex justify={"center"} align={"center"}>
-                                    <Button color={theme.accentColor} variant="light" my={"xl"}>{">"}</Button>
-                                </Flex>
-                            </Grid.Col>
-                        </Grid >
+    return <>
+        <Head>
+            <title>{userDBInfo?.displayName || "Profile"} - Refactr</title>
+        </Head>
+        <Flex direction="column" align={"center"} h={"100vh"} c={theme.primaryTextColor} >
+            <Navbar />
+            <Grid grow columns={12} w={"100vw"} h={"90vh"} p={"lg"} bg={theme.background}>
+                <Grid.Col span={8}>
+                    <Box style={boxStyling}>
+                        <Title align="center" order={3}>Problems</Title>
+                        <Space h="md" />
+                        <Divider />
+                        <Space h="md" />
+                        <Title order={3}>Unsolved Problems</Title>
                         <Divider my={10} />
-                    </>
-                    )}
-                </Box>
-            </Grid.Col>
+                        {userInfo.curProblems.map((prob) => <>
+                            <Grid columns={12} w={"95%"} grow h={90}>
+                                <Grid.Col span={3}>
+                                    <Flex justify={"center"} align={"center"} h={"100%"}>
+                                        <Text>{prob.name}</Text>
+                                    </Flex>
+                                </Grid.Col>
+                                <Grid.Col span={6}>
+                                    <Flex direction="column" align={"center"} w={"100%"}>
+                                        {prob.difficulty == "Easy" ?
+                                            <Badge color={theme.accentColor} m={8}>Easy</Badge> :
+                                            <Badge color={"red"} m={8}>Hard</Badge>
+                                        }
+                                        <Box>
+                                            {prob.tags.map((tag) => <Badge color={theme.accentColor} m={8} variant="light">{tag}</Badge>)}
+                                        </Box>
+                                    </Flex>
+                                </Grid.Col>
+                                <Grid.Col span={1}>
+                                    <Flex justify={"center"} align={"center"}>
+                                        <Button color={theme.accentColor} variant="light" my={"xl"}>{">"}</Button>
+                                    </Flex>
+                                </Grid.Col>
+                            </Grid >
+                            <Divider my={10} />
+                        </>
+                        )}
+                    </Box>
+                </Grid.Col>
 
-            <Grid.Col span={4}>
-                <Box style={boxStyling}>
-                    <Flex direction="column" align="center" justify="center">
-                        <Avatar src={user?.photoURL || ""} radius={"xl"} size={"xl"} />
-                        <Title order={2}>{user?.displayName || "User"}</Title>
-                        <Button w={"70%"} mt={10} color={theme.accentColor} onClick={() => router.push("account-settings")}>Account Settings</Button>
-                    </Flex>
-                    <Space h="md" />
-                    <Divider />
-                    <Space h="md" />
-                    <Stack spacing="md">
-                        <Title order={3}>Languages</Title>
-                        <Box>
-                            {userInfo.languages.map((language) => <Badge color={theme.accentColor} m={8} variant="light">{language}</Badge>)}
-                        </Box>
-                    </Stack>
-                    <Space h="md" />
-                    <Divider />
-                    <Space h="md" />
-                    <Stack spacing="md">
-                        <Title order={3}>Skills</Title>
-                        <Box>
-                            {userInfo.skills.map((skill) => <Badge color={theme.accentColor} m={8} variant="light">{skill}</Badge>)}
-                        </Box>
-                    </Stack>
-                </Box>
-            </Grid.Col>
-        </Grid>
+                <Grid.Col span={4}>
+                    <Box style={boxStyling}>
+                        <Flex direction="column" align="center" justify="center">
+                            <Avatar src={user?.photoURL || ""} radius={"xl"} size={"xl"} />
+                            <Title order={2}>{user?.displayName || "User"}</Title>
+                            <Button w={"70%"} mt={10} color={theme.accentColor} onClick={() => router.push("/settings")}>Account Settings</Button>
+                        </Flex>
+                        <Space h="md" />
+                        <Divider />
+                        <Space h="md" />
+                        <Stack spacing="md">
+                            <Title order={3}>Languages</Title>
+                            <Box>
+                                {userInfo.languages.map((language) => <Badge color={theme.accentColor} m={8} variant="light">{language}</Badge>)}
+                            </Box>
+                        </Stack>
+                        <Space h="md" />
+                        <Divider />
+                        <Space h="md" />
+                        <Stack spacing="md">
+                            <Title order={3}>Skills</Title>
+                            <Box>
+                                {userInfo.skills.map((skill) => <Badge color={theme.accentColor} m={8} variant="light">{skill}</Badge>)}
+                            </Box>
+                        </Stack>
+                    </Box>
+                </Grid.Col>
+            </Grid>
 
-    </Flex >
+        </Flex >
+    </>
 }

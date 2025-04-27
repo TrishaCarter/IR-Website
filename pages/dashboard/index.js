@@ -12,6 +12,7 @@ import LeaderboardSpot from "../../components/LeaderboardSpot";
 import UserBadges from "../../components/dashboard/UserBadges";
 import OnboardingModals from "../../components/Onboarding"
 import { getProblemsWithSolutionCounts } from "../../queries"
+import Head from "next/head"
 
 
 export default function DashboardPage() {
@@ -58,7 +59,9 @@ export default function DashboardPage() {
     }
 
     return <>
-
+        <Head>
+            <title>User Dashboard</title>
+        </Head>
         {needOnboard ? <>
             <Overlay blur={2} color="#000" opacity={0.5} />
             <OnboardingModals onComplete={finishOnboarding} />

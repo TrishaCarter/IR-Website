@@ -17,6 +17,7 @@ import { IconTrash } from '@tabler/icons-react';
 import Navbar from '../../../components/Navbar';
 import { createProblem } from '../../../firebase';
 import { Editor } from "@monaco-editor/react";
+import Head from 'next/head';
 
 export default function CreateProblem() {
     // Basic problem info
@@ -151,7 +152,10 @@ export default function CreateProblem() {
         }
     };
 
-    return (
+    return <>
+        <Head>
+            <title>Create a Problem - Refactr</title>
+        </Head>
         <Flex w={"100vw"} mah={"100vh"} m={0} direction={"column"} align={"center"} bg={theme.background} c={theme.primaryTextColor}>
             <Navbar />
             <ScrollArea w={"100vw"} h={"90vh"} style={{ overflowY: "scroll" }}>
@@ -351,5 +355,5 @@ export default function CreateProblem() {
                 <Space h={40} />
             </ScrollArea>
         </Flex>
-    );
+    </>
 }

@@ -6,6 +6,7 @@ import { auth, googleProvider, db } from '../../firebase';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { loginUser } from '@/handlers';
 import { useRouter } from 'next/router';
+import Head from "next/head"
 
 export default function SignInPage() {
     const router = useRouter();
@@ -120,7 +121,10 @@ export default function SignInPage() {
 
     }
 
-    return (
+    return <>
+        <Head>
+            <title>Log In - Refactr</title>
+        </Head>
         <Center style={{ minHeight: '100vh', backgroundColor: theme.background }}>
             <Box sx={{ maxWidth: 400, width: '100%', padding: 24, borderRadius: 8 }}>
                 {/* <Title order={1}>IR Website (Name tbd)</Title> */}
@@ -214,5 +218,5 @@ export default function SignInPage() {
                 </Text>
             </Box>
         </Center >
-    );
+    </>
 }
