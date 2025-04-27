@@ -14,8 +14,6 @@ export default function SignInPage() {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    // State used for success or failure message on signup
-    const [signupText, setSignupText] = useState('');
 
     let theme = {
         background: '#16171b',
@@ -53,12 +51,22 @@ export default function SignInPage() {
                 // Signed in
                 const user = userCredential.user;
                 setSignupText('Account created successfully. Redirecting to login page...');
+                notifications.show({ // Show success notification
+                    title: 'Account Created!',
+                    message: 'Account created successfully. Redirecting to dashboard...',
+                    color: 'green',
+                });
                 router.push('/login');
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorCode, errorMessage);
+                notifications.show({ // Show success notification
+                    title: 'Error creating account',
+                    message: 'Please try again.',
+                    color: 'red',
+                });
             });
     }
 
@@ -72,6 +80,11 @@ export default function SignInPage() {
             if (userDoc) {
                 console.log('User data found:', userDoc);
                 setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+                notifications.show({ // Show success notification
+                    title: 'Google Login Successful',
+                    message: 'Logged in successfully. Redirecting to dashboard...',
+                    color: 'green',
+                });
                 loginUser(uid).then(() => {
                     router.push('/dashboard');
                 }).catch((error) => {
@@ -88,6 +101,11 @@ export default function SignInPage() {
             try {
                 createUserDoc(uid, userData);
                 console.log("User data created successfully.");
+                notifications.show({ // Show success notification
+                    title: 'Google Login Successful',
+                    message: 'Logged in successfully. Redirecting to dashboard...',
+                    color: 'green',
+                });
                 router.push('/dashboard');
             } catch (error) {
                 console.error('Error creating user data:', error);
@@ -96,14 +114,11 @@ export default function SignInPage() {
         } catch (error) {
             console.log("Error with Google Sign In Popup:")
             console.error(error);
-            // if error string includes "INTERNAL ASSERTION FAILED"
-            if (error.message.includes("INTERNAL ASSERTION FAILED")) {
-                notifications.show({
-                    title: 'Error',
-                    message: 'Google Sign In failed. Please try again.',
-                    color: 'red',
-                });
-            }
+            notifications.show({ // Show success notification
+                title: 'Error with Google Sign In',
+                message: 'Please try again.',
+                color: 'red',
+            });
 
         }
     }

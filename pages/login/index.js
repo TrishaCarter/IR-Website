@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Header, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
+import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Header, Divider, Box, Text, Center, Stack, Title, RemoveScroll } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
 import { setPersistence, browserSessionPersistence, signInWithEmailAndPassword, signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider, db } from '../../firebase';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
+import { notifications } from '@mantine/notifications';
 import { loginUser } from '@/handlers';
 import { useRouter } from 'next/router';
 import Head from "next/head"
@@ -53,8 +54,11 @@ export default function SignInPage() {
 
             let userDoc = await getUserDoc(uid);
             if (userDoc) {
-                console.log('User data found:', userDoc);
-                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+                notifications.show({ // Show success notification
+                    title: 'Login Successful',
+                    message: 'Logged in successfully. Redirecting to dashboard...',
+                    color: 'green',
+                });
                 loginUser(uid).then(() => {
                     router.push('/dashboard');
                 }).catch((error) => {
@@ -71,6 +75,11 @@ export default function SignInPage() {
             try {
                 createUserDoc(uid, userData);
                 console.log("User data created successfully.");
+                notifications.show({ // Show success notification
+                    title: 'Login Successful',
+                    message: 'Logged in successfully. Redirecting to dashboard...',
+                    color: 'green',
+                });
                 router.push('/dashboard');
             } catch (error) {
                 console.error('Error creating user data:', error);
@@ -79,6 +88,11 @@ export default function SignInPage() {
         } catch (error) {
             console.log("Error with Google Sign In Popup:")
             console.error(error);
+            notifications.show({ // Show error notification
+                title: 'Login Failed',
+                message: error.message,
+                color: 'red',
+            });
         }
     }
 
@@ -93,6 +107,11 @@ export default function SignInPage() {
             if (userDoc) {
                 console.log('User data found:', userDoc);
                 setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+                notifications.show({ // Show success notification
+                    title: 'Login Successful',
+                    message: 'Logged in successfully. Redirecting to dashboard...',
+                    color: 'green',
+                });
                 loginUser(uid).then(() => {
                     router.push('/dashboard');
                 }).catch((error) => {
@@ -117,11 +136,16 @@ export default function SignInPage() {
         } catch (error) {
             console.log("Error with Google Sign In Popup:")
             console.error(error);
+            notifications.show({ // Show error notification
+                title: 'Login Failed',
+                message: error.message,
+                color: 'red',
+            });
         }
 
     }
 
-    return <>
+    return <RemoveScroll>
         <Head>
             <title>Log In - Refactr</title>
         </Head>
@@ -218,5 +242,5 @@ export default function SignInPage() {
                 </Text>
             </Box>
         </Center >
-    </>
+    </RemoveScroll>
 }
