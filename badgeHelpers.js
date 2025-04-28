@@ -1,5 +1,6 @@
 import { updateDoc } from "firebase/firestore";
 import { getAllProblems, getAllSolutions, getUserById } from "./firebase";
+import { notifications } from "@mantine/notifications";
 
 
 export let checkAllBadges = async (uid) => {
@@ -21,6 +22,12 @@ export let checkAllBadges = async (uid) => {
         if (firstSteps) {
             userBadges.push("first-steps");
             await updateDoc(userDocRef, { badges: userBadges });
+            notifications.show({
+                title: "Badge Unlocked!",
+                message: "You have unlocked the First Steps badge!",
+                color: "green",
+                autoClose: 5000,
+            })
         }
     }
     if (!majorCoder) {
@@ -28,6 +35,12 @@ export let checkAllBadges = async (uid) => {
         if (majorCoder) {
             userBadges.push("major-coder");
             await updateDoc(userDocRef, { badges: userBadges });
+            notifications.show({
+                title: "Badge Unlocked!",
+                message: "You have unlocked the Major Coder badge!",
+                color: "green",
+                autoClose: 5000,
+            })
         }
     }
     if (!heWasNumberOne) {
@@ -35,6 +48,12 @@ export let checkAllBadges = async (uid) => {
         if (heWasNumberOne) {
             userBadges.push("he-was-number-one");
             await updateDoc(userDocRef, { badges: userBadges });
+            notifications.show({
+                title: "Badge Unlocked!",
+                message: "You have unlocked the Smitty Werbenjägermanjensen badge!",
+                color: "green",
+                autoClose: 5000,
+            })
         }
     }
     if (!fivePiece) {
@@ -42,6 +61,12 @@ export let checkAllBadges = async (uid) => {
         if (fivePiece) {
             userBadges.push("5-piece");
             await updateDoc(userDocRef, { badges: userBadges });
+            notifications.show({
+                title: "Badge Unlocked!",
+                message: "You have unlocked the 5-Piece badge!",
+                color: "green",
+                autoClose: 5000,
+            })
         }
     }
 }
