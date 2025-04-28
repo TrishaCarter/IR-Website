@@ -1,6 +1,7 @@
 import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar, Box, Divider } from "@mantine/core"
 import { useEffect, useState } from "react";
 import { auth, getUserDoc } from "../firebase";
+import { checkAllBadges } from "../badgeHelpers";
 import { useRouter } from "next/router";
 
 export default function Navbar() {
@@ -30,6 +31,19 @@ export default function Navbar() {
 
         getUser();
     }, [])
+
+    // Check for badge unlocks on basically every page load
+    useEffect(() => {
+        if (user) {
+            let uid = user.uid;
+            checkAllBadges(uid).then(() => {
+                console.log("Checked all badges for user:", uid);
+            }
+            ).catch((error) => {
+                console.error("Error checking badges:", error);
+            });
+        }
+    })
 
     let theme = {
         background: '#16171b',
