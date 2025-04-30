@@ -83,8 +83,10 @@ let checkFirstSteps = async (uid) => {
 
 // Check if the user has solved their first problem
 let checkMajorCoder = async (uid) => {
-    let problems = await getAllProblems();
-    let solvedProblems = problems.filter(problem => problem.solvedBy.includes(uid));
+    let solvedProblems = [];
+    getAllSolutions().then((solutions) => {
+        solvedProblems = solutions.filter((solution) => solution.uid === uid);
+    })
     return (solvedProblems.length > 0 ? true : false);
 }
 
@@ -96,6 +98,7 @@ let checkHeWasNumberOne = async (uid) => {
     // For each problem, get the highest score
     for (let problem of problems) {
         let userScore = solutions.find(solution => solution.uid === uid && solution.probid === problem.id)?.score;
+        let highestScore = Math.max(...solutions.filter(solution => solution.probid === problem.id).map(solution => solution.score));
 
         if (userScore >= highestScore) {
             return true;
