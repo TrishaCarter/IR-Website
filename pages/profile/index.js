@@ -197,6 +197,9 @@ export default function Profile() {
                         <Flex direction="column" align="center" justify="center">
                             <Avatar src={userDBInfo?.photoURL || ""} radius={"xl"} size={"xl"} />
                             <Title order={2}>{userDBInfo?.displayName || "User"}</Title>
+                            <Center>
+                                <Badge color={theme.accentColor} variant="light" size={"lg"} w={100} h={32} m={8}>{userDBInfo?.currency || 0} ¢</Badge>
+                            </Center>
                             <Button w={"70%"} mt={10} color={theme.accentColor} onClick={() => router.push("/settings")}>Account Settings</Button>
                         </Flex>
                         <Space h="md" />
