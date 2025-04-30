@@ -75,7 +75,6 @@ export const updateUserProfilePic = async (uid, url) => {
 
 
 export let getAllProblems = async () => {
-    let problems = [];
     let problemsRef = collection(db, 'PROBLEMS');
     try {
         const querySnapshot = await getDocs(problemsRef);
@@ -107,6 +106,18 @@ export let createProblem = async (data) => {
 
     } catch (error) {
         console.error('Error creating problem: ', error);
+    }
+}
+
+export let getAllSolutions = async () => {
+    let solutionsRef = collection(db, 'SOLUTIONS');
+    try {
+        const querySnapshot = await getDocs(solutionsRef);
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return data;
+    } catch (error) {
+        console.error("Error fetching documents: ", error);
+        return [];
     }
 }
 
@@ -173,6 +184,10 @@ export let getProblemSolutions = async (problemId) => {
 }
 
 export let getUserById = async (uid) => {
+    if (!uid) {
+        console.log("No UID provided");
+        return null;
+    }
     let docRef = doc(db, 'USERS', uid);
     let docSnap = await getDoc(docRef);
 

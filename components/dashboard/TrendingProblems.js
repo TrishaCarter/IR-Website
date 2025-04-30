@@ -1,14 +1,9 @@
-import { Card, Title, Text, Badge, Stack, Group } from "@mantine/core";
+import { Card, Title, Text, Badge, Stack, Group, Button, Flex } from "@mantine/core";
+import { useEffect, useState } from "react";
+import { getProblemsWithSolutionCounts } from "../../queries";
 
-export default function TrendingProblems({ topProblems }) {
-
-    let problems = topProblems ? topProblems : [
-        { name: "Two Sum", difficulty: "Easy" },
-        { name: "Add Two Numbers", difficulty: "Medium" },
-        { name: "Longest Substring Without Repeating Characters", difficulty: "Medium" },
-        { name: "Median of Two Sorted Arrays", difficulty: "Hard" },
-        { name: "Longest Palindromic Substring", difficulty: "Medium" },
-    ]
+export default function TrendingProblems() {
+    let [problems, setProblems] = useState([]);
 
     let theme = {
         background: '#16171b',
@@ -18,6 +13,23 @@ export default function TrendingProblems({ topProblems }) {
         accentColor: '#629C44',
     }
 
+    useEffect(() => {
+        getProblemsWithSolutionCounts()
+            .then((problems) => {
+                console.log(problems);
+                setProblems(problems.slice(0, 5));
+
+            })
+            .catch((error) => {
+                console.error("Error fetching problems with solution counts:", error);
+            });
+    }, [])
+
+    let handleProbRedirect = (slug) => {
+        // Redirect to the problem page
+        window.location.href = `/problems/${slug}`;
+    }
+
     return (
         <Card shadow="sm" w={"45vw"} padding="lg" radius="md"
             style={{
@@ -25,18 +37,21 @@ export default function TrendingProblems({ topProblems }) {
                 color: "#fff",
                 border: "1px solid #fff"
             }}>
-            <Title order={3} style={{ color: "#6EBF63" }}>Trending Problems</Title>
-            <Text size="sm" c={theme.secondaryTextColor}>Look at the most popular problems!</Text>
+            <Title order={3} c={theme.accentColor}>Trending Problems</Title>
+            <Text size="sm" c={theme.secondaryTextColor}>These problems currently have the most solutions!</Text>
 
             <Stack mt="md">
                 {problems.map((problem, index) => (
                     <Group position="apart" key={index}>
                         <Title order={4} style={{ color: "#fff" }}>{index + 1}.</Title>
-                        <Card key={index} shadow="xs" padding="sm" style={{ backgroundColor: "#1e1e1e" }} w={"90%"}>
-                            <Text size="sm" c={theme.primaryTextColor}>{problem.name}</Text>
-                            <Badge color={problem.difficulty === "Easy" ? "green" : problem.difficulty === "Medium" ? "orange" : "red"} mt={5}>
-                                {problem.difficulty}
-                            </Badge>
+                        <Card key={index} shadow="xs" px={"md"} style={{ backgroundColor: "#1e1e1e" }} w={"90%"}>
+                            <Flex w={"100%"} h={"100%"} direction={"row"} justify="space-between" align="center">
+                                <Text size="sm" c={theme.primaryTextColor}>{problem.title}</Text>
+                                <Button px="5" w={"60px"} h={40} size="sm"
+                                    bg={theme.accentColor}
+                                    onClick={() => handleProbRedirect(problem.slugTitle)}
+                                >Solve!</Button>
+                            </Flex>
                         </Card>
                     </Group>
                 ))}

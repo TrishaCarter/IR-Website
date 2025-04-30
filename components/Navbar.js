@@ -1,17 +1,24 @@
-import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar, Box, Divider } from "@mantine/core"
+import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar, Box, Divider, Badge } from "@mantine/core"
 import { useEffect, useState } from "react";
 import { auth, getUserDoc } from "../firebase";
+import { checkAllBadges } from "../badgeHelpers";
 import { useRouter } from "next/router";
 
 export default function Navbar() {
     let router = useRouter();
     let [user, setUser] = useState(null);
     let [avatar, setAvatar] = useState('');
+    let [userInfo, setUserInfo] = useState(null);
 
     useEffect(() => {
         let getUser = async () => {
             let userData = await auth.currentUser;
-            let userDoc = await getUserDoc(userData.uid);
+            let userDoc;
+            try {
+                userDoc = await getUserDoc(userData.uid);
+            } catch (error) {
+                console.log("Error fetching user document:", error);
+            }
 
             if (userData == null) {
                 console.log("No user logged in");
@@ -19,12 +26,26 @@ export default function Navbar() {
                 return;
             }
 
-            setUser(auth.currentUser);
-            setAvatar(userDoc.photoURL || null);
+            setUser(auth.currentUser || null);
+            setUserInfo(userDoc);
+            setAvatar(userDoc?.photoURL || null);
         }
 
         getUser();
     }, [])
+
+    // Check for badge unlocks on basically every page load
+    useEffect(() => {
+        if (user) {
+            let uid = user.uid;
+            checkAllBadges(uid).then(() => {
+                console.log("Checked all badges for user:", uid);
+            }
+            ).catch((error) => {
+                console.error("Error checking badges:", error);
+            });
+        }
+    })
 
     let theme = {
         background: '#16171b',
@@ -62,31 +83,35 @@ export default function Navbar() {
                 <Anchor href={"/dashboard"} style={{ color: theme.accentColor }}>Dashboard</Anchor>
                 <Anchor href={"/problems"} style={{ color: theme.accentColor }}>Problems</Anchor>
             </Group>
-            <Menu
-                transitionProps={{ transition: 'pop-top-right' }}
-                position="top-end"
-                width={220}
-                withinPortal={false}
 
-            >
-                <Menu.Target>
-                    <Avatar src={avatar} size={30} m={0} />
-                </Menu.Target>
-                <Menu.Dropdown w={130} bg={theme.secondaryBackground} style={{ borderRadius: '10px' }} bd={`1px solid ${theme.secondaryTextColor}`}>
-                    <Box style={dropdownBoxStyle} onClick={() => router.push("/profile")}>
-                        <Text c={theme.accentColor}>Profile</Text>
-                    </Box>
-                    <Divider />
-                    <Box style={dropdownBoxStyle}>
+            <Group>
+                <Badge color={theme.accentColor} variant="light">{userInfo?.currency || 0}¢</Badge>
+                <Menu
+                    transitionProps={{ transition: 'pop-top-right' }}
+                    position="top-end"
+                    width={220}
+                    withinPortal={false}
 
-                        <Anchor href={"/settings"} c={theme.accentColor}>Settings</Anchor>
-                    </Box>
-                    <Divider />
-                    <Box style={dropdownBoxStyle}>
-                        <Anchor onClick={handleLogout} variant="light" c={"red"}>Log Out</Anchor>
-                    </Box>
-                </Menu.Dropdown>
-            </Menu>
+                >
+                    <Menu.Target>
+                        <Avatar src={avatar} size={30} m={0} />
+                    </Menu.Target>
+                    <Menu.Dropdown w={130} bg={theme.secondaryBackground} style={{ borderRadius: '10px' }} bd={`1px solid ${theme.secondaryTextColor}`}>
+                        <Box style={dropdownBoxStyle} onClick={() => router.push("/profile")}>
+                            <Text c={theme.accentColor}>Profile</Text>
+                        </Box>
+                        <Divider />
+                        <Box style={dropdownBoxStyle}>
+
+                            <Anchor href={"/settings"} c={theme.accentColor}>Settings</Anchor>
+                        </Box>
+                        <Divider />
+                        <Box style={dropdownBoxStyle}>
+                            <Anchor onClick={handleLogout} variant="light" c={"red"}>Log Out</Anchor>
+                        </Box>
+                    </Menu.Dropdown>
+                </Menu>
+            </Group>
         </Flex>
     )
 }

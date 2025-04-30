@@ -4,6 +4,7 @@ import { auth, updateUserProfilePic, uploadProfilePic, getUserDoc } from '../../
 import { updatePassword } from 'firebase/auth';
 import Navbar from "../../components/Navbar";
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 
 const theme = {
     background: '#16171b',
@@ -108,6 +109,9 @@ export default function AccountSettings() {
 
     return (
         <>
+            <Head>
+                <title>Account Settings - Refactr</title>
+            </Head>
             <Navbar />
             < Center c={theme.primaryTextColor} style={{ background: theme.background, minHeight: '100vh', display: 'flex', flexDirection: 'column', justifyContent: 'center' }
             }>

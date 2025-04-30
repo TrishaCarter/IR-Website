@@ -11,6 +11,7 @@ import { auth, getProblemBySlug, trackSolution, updateUserScore } from "../../..
 import { Editor } from "@monaco-editor/react";
 import { notifications } from '@mantine/notifications';
 import { AuthContext } from '../../_app';
+import Head from 'next/head';
 
 export default function ProblemPage() {
     let router = useRouter();
@@ -283,6 +284,9 @@ export default function ProblemPage() {
 
     return (
         <RemoveScroll>
+            <Head>
+                <title>{prob.title} - Refactr</title>
+            </Head>
             <Navbar />
             <Flex
                 w={"100vw"}
