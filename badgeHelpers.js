@@ -1,5 +1,5 @@
-import { updateDoc } from "firebase/firestore";
-import { getAllProblems, getAllSolutions, getUserById } from "./firebase";
+import { doc, updateDoc } from "firebase/firestore";
+import { db, getAllProblems, getAllSolutions, getUserById } from "./firebase";
 import { notifications } from "@mantine/notifications";
 
 
