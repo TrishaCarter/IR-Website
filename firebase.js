@@ -72,7 +72,15 @@ export const updateUserProfilePic = async (uid, url) => {
     await setDoc(userRef, { photoURL: url }, { merge: true });
 };
 
+export const updateUsername = async (uid, username) => {
+    const userRef = doc(db, 'USERS', uid);
+    await setDoc(userRef, { displayName: username }, { merge: true });
+};
 
+export const updateUserEmail = async (uid, email) => {
+    const userRef = doc(db, 'USERS', uid);
+    await setDoc(userRef, { email: email }, { merge: true });
+};
 
 export let getAllProblems = async () => {
     let problemsRef = collection(db, 'PROBLEMS');

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TextInput, PasswordInput, Button, Switch, Group, Box, Title, Avatar, FileButton, Center, FileInput } from '@mantine/core';
-import { auth, updateUserProfilePic, uploadProfilePic, getUserDoc } from '../../firebase';
-import { updatePassword } from 'firebase/auth';
+import { auth, updateUserProfilePic, uploadProfilePic, getUserDoc, updateUsername, updateUserEmail } from '../../firebase';
+import { updateEmail, updatePassword } from 'firebase/auth';
 import Navbar from "../../components/Navbar";
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -71,13 +71,25 @@ export default function AccountSettings() {
     };
 
     const handleUpdateEmail = async () => {
-        updateEmail(auth.currentUser, "user@example.com").then(() => {
-            // Email updated!
-            // ...
-        }).catch((error) => {
-            // An error occurred
-            // ...
-        });
+        try {
+            await updateEmail(auth.currentUser, email);
+            await updateUserEmail(auth.currentUser.uid, email);
+            alert('Email updated successfully!');
+        } catch (error) {
+            alert('Error updating email: ' + error.message);
+        }
+    }
+
+    const handleUpdateUsername = async () => {
+        try {
+            await updateProfile(auth.currentUser, {
+                displayName: username,
+            });
+            await updateUsername(auth.currentUser.uid, username);
+            alert('Username updated successfully!');
+        } catch (error) {
+            alert('Error updating username: ' + error.message);
+        }
     }
 
     const handleUpdateProfile = async () => {
@@ -90,15 +102,19 @@ export default function AccountSettings() {
             }
 
             if (usernameChanged) {
-                alert("Username updating not in place yet")
+                handleUpdateUsername().then(() => {
+                    alert("Username updated successfully!");
+                }).catch((error) => {
+                    alert("Error updating username: " + error.message);
+                })
             }
 
             if (emailChanged) {
-                updateEmail(auth.currentUser, email).then(() => {
+                handleUpdateEmail().then(() => {
                     alert("Email updated successfully!");
                 }).catch((error) => {
                     alert("Error updating email: " + error.message);
-                });
+                })
             }
 
         } catch (error) {
@@ -123,8 +139,17 @@ export default function AccountSettings() {
                             {(props) => <Button {...props} >Upload image</Button>}
                         </FileButton>
                     </Center>
-                    <TextInput label="Username" disabled value={username} onChange={(e) => setUsername(e.target.value)} mb="sm" size="md" />
-                    <TextInput label="Email" value={email} onChange={(e) => setEmail(e.target.value)} mb="sm" size="md" />
+                    <TextInput label="Username" value={username}
+                        onChange={(e) => {
+                            setUsername(e.target.value);
+                            setUsernameChanged(true);
+                        }
+                        } mb="sm" size="md" />
+                    <TextInput label="Email" value={email} onChange={(e) => {
+                        setEmail(e.target.value)
+                        setEmailChanged(true);
+                    }
+                    } mb="sm" size="md" />
                     <PasswordInput label="New Password" value={password} onChange={(e) => setPassword(e.target.value)} mb="lg" size="md" />
                     <Group position="apart" mt="xl" >
                         <Button onClick={handleUpdateProfile} size="xl" > Save Changes </Button>
