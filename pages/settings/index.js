@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TextInput, PasswordInput, Button, Switch, Group, Box, Title, Avatar, FileButton, Center, FileInput } from '@mantine/core';
 import { auth, updateUserProfilePic, uploadProfilePic, getUserDoc, updateUsername, updateUserEmail } from '../../firebase';
-import { updateEmail, updatePassword } from 'firebase/auth';
+import { updateEmail, updatePassword, updateProfile } from 'firebase/auth';
 import Navbar from "../../components/Navbar";
 import { useRouter } from 'next/router';
 import Head from 'next/head';
@@ -43,7 +43,7 @@ export default function AccountSettings() {
             console.log(userData);
 
             setEmail(userData.email);
-            setUsername(userDoc.username || '');
+            setUsername(userDoc.displayName || '');
             setPreview(userDoc.photoURL || null);
         }
 
@@ -71,25 +71,15 @@ export default function AccountSettings() {
     };
 
     const handleUpdateEmail = async () => {
-        try {
-            await updateEmail(auth.currentUser, email);
-            await updateUserEmail(auth.currentUser.uid, email);
-            alert('Email updated successfully!');
-        } catch (error) {
-            alert('Error updating email: ' + error.message);
-        }
+        await updateEmail(auth.currentUser, email);
+        await updateUserEmail(auth.currentUser.uid, email);
     }
 
     const handleUpdateUsername = async () => {
-        try {
-            await updateProfile(auth.currentUser, {
-                displayName: username,
-            });
-            await updateUsername(auth.currentUser.uid, username);
-            alert('Username updated successfully!');
-        } catch (error) {
-            alert('Error updating username: ' + error.message);
-        }
+        await updateProfile(auth.currentUser, {
+            displayName: username,
+        });
+        await updateUsername(auth.currentUser.uid, username);
     }
 
     const handleUpdateProfile = async () => {
@@ -142,6 +132,7 @@ export default function AccountSettings() {
                     <TextInput label="Username" value={username}
                         onChange={(e) => {
                             setUsername(e.target.value);
+                            console.log("USERNAME:", e.target.value);
                             setUsernameChanged(true);
                         }
                         } mb="sm" size="md" />
