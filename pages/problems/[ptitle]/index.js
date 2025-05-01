@@ -115,6 +115,19 @@ export default function ProblemPage() {
     };
 
     const checkSolution = async () => {
+
+        // Check with regex for includes, and stop process if found
+        let reg = /.*#\s*include.*/gm;
+        if (reg.test(code)) {
+            notifications.show({
+                title: "Submission halted",
+                message: "Your code contains 'include' statements.",
+                color: "red",
+                autoClose: 2000,
+            });
+            return; // Stop further processing
+        }
+
         // Run test cases; only proceed if all pass.
         const results = await runTestCases();
         console.log("All test cases ran");
