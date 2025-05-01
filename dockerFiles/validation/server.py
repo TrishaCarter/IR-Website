@@ -5,7 +5,7 @@ from flask_cors import CORS
 import json
 
 app = Flask(__name__)
-CORS(app, origins=["*"])
+CORS(app, resources={r"/run_test": {"origins": "*"}})
 
 def slug_to_camel(slug):
     parts = slug.split('-')
