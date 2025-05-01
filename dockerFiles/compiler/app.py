@@ -3,7 +3,7 @@ from flask_cors import CORS
 import subprocess, os, time, tempfile
 
 app = Flask(__name__)
-CORS(app, resources={r"/check": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/check": {"origins": "*"}})
 
 @app.route('/check', methods=['POST', 'OPTIONS'])
 def check():
@@ -30,6 +30,7 @@ def check():
 
         # Write the user-submitted code to testing.c in the repo.
         testing_c_path = os.path.join(repo_path, "testing.c")
+        # if it doesnt exist, create the testing.c file
         with open(testing_c_path, "w") as f:
             f.write(code)
             print(code)
