@@ -19,6 +19,8 @@ def check():
         cuda = data.get("cuda", False)
         uid = data.get("user")
         probID = data.get("probID")
+        numArgs = data.get("numArgs")
+        functionName = data.get("functionName")
 
         if not probID:
             return jsonify({"error": "Missing probID"}), 400
@@ -45,7 +47,7 @@ def check():
             )
         else:
             proc = subprocess.Popen(
-                ["python3", "c_preprocess.py", "testing.c", '{"#1": "$1"}', "c.rbe", str(probID)],
+                ["python3", "c_preprocess.py", "testing.c", numArgs, functionName, '{"#1": "$1"}', "c.rbe", str(probID)],
                 cwd=repo_path,
                 universal_newlines=True,
                 stdout=subprocess.PIPE,

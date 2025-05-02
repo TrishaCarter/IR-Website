@@ -133,7 +133,6 @@ export default function ProblemPage() {
         console.log("All test cases ran");
         console.log(results.passed);
 
-
         if (!results.passed) {
             notifications.show({
                 title: "Submission halted",
@@ -164,7 +163,9 @@ export default function ProblemPage() {
                 code: results.code,
                 user: auth.currentUser?.uid,
                 cuda: false,
-                probID: probID
+                probID: probID,
+                numArgs: prob.args.length,
+                functionName: prob.functionName,
             })
         })
             .then(response => {

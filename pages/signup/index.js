@@ -79,7 +79,6 @@ export default function SignInPage() {
             let userDoc = await getUserDoc(uid);
             if (userDoc) {
                 console.log('User data found:', userDoc);
-                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
                 notifications.show({ // Show success notification
                     title: 'Google Login Successful',
                     message: 'Logged in successfully. Redirecting to dashboard...',
