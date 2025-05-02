@@ -61,6 +61,9 @@ export default function ProblemPage() {
                 }
             };
 
+            console.log(`Test case ${index + 1} payload:`, testCasePayload);
+
+
             console.log("Sending a fetch...");
 
             return fetch(`http://${process.env.NEXT_PUBLIC_VALIDATION_URL}/run_test`, {

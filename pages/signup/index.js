@@ -50,7 +50,6 @@ export default function SignInPage() {
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
-                setSignupText('Account created successfully. Redirecting to login page...');
                 notifications.show({ // Show success notification
                     title: 'Account Created!',
                     message: 'Account created successfully. Redirecting to dashboard...',

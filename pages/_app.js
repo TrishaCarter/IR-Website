@@ -27,12 +27,18 @@ export default function App({ Component, pageProps }) {
                     content="minimum-scale=1, initial-scale=1, width=device-width, user-scalable=no"
                 />
                 <link rel="shortcut icon" href="/favicon.svg" />
+                {/* <link rel='stylesheet' type='text/css'>
+                    {`
+                    .custom-modal {
+                        background - color: ${theme.secondaryBackground};
+                    } */}
+                {/* </style> */}
             </Head>
             <AuthProvider>
                 <Notifications bg={theme.background} />
                 <Component {...pageProps} />
             </AuthProvider>
-        </MantineProvider>
+        </MantineProvider >
     );
 }
 
