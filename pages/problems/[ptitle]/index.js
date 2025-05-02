@@ -82,7 +82,7 @@ export default function ProblemPage() {
                             title: `Test Case ${index + 1} passed`,
                             message: "Test passed",
                             color: "green",
-                            autoClose: 1000,
+                            autoClose: 10000,
                         });
                         return true;
                     } else {
@@ -90,7 +90,7 @@ export default function ProblemPage() {
                             title: `Test Case ${index + 1} failed`,
                             message: "Your solution did not pass this test case",
                             color: "red",
-                            autoClose: 2000,
+                            autoClose: 10000,
                         });
                         return false;
                     }
@@ -100,7 +100,7 @@ export default function ProblemPage() {
                         title: `Test Case ${index + 1} error`,
                         message: "Error executing test case",
                         color: "red",
-                        autoClose: 2000,
+                        autoClose: 10000,
                     });
                     console.error("Error in test case:", error);
                     return false;
@@ -126,7 +126,7 @@ export default function ProblemPage() {
                 title: "Submission halted",
                 message: "Your code contains 'include' statements.",
                 color: "red",
-                autoClose: 2000,
+                autoClose: 10000,
             });
             return; // Stop further processing
         }
@@ -141,7 +141,7 @@ export default function ProblemPage() {
                 title: "Submission halted",
                 message: "One or more test cases failed.",
                 color: "red",
-                autoClose: 2000,
+                autoClose: 10000,
             });
             return; // Stop further processing
         }
@@ -150,7 +150,7 @@ export default function ProblemPage() {
             title: "All test cases passed",
             message: "Compiling your code...",
             color: "green",
-            autoClose: 1000,
+            autoClose: 10000,
         });
 
         console.log(probID);
@@ -201,7 +201,7 @@ export default function ProblemPage() {
                             title: "Code compiled successfully!",
                             message: `Score: ${score}`,
                             color: "green",
-                            autoClose: 2000,
+                            autoClose: 10000,
                         });
                     });
             });
