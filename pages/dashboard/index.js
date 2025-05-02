@@ -1,5 +1,5 @@
 
-import { Flex, Title, Grid, Overlay, Text } from "@mantine/core"
+import { Flex, Title, Grid, Overlay, Text, RemoveScroll } from "@mantine/core"
 import { auth, db } from "../../firebase"
 import { useContext, useEffect, useState } from "react"
 import { useRouter } from "next/router"
@@ -58,7 +58,7 @@ export default function DashboardPage() {
         })
     }
 
-    return <>
+    return <RemoveScroll>
         <Head>
             <title>User Dashboard</title>
         </Head>
@@ -82,5 +82,5 @@ export default function DashboardPage() {
                 </Grid.Col>
             </Grid>
         </Flex >
-    </>
+    </RemoveScroll>
 }
