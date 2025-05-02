@@ -1,21 +1,25 @@
 
-import { Flex, Title, Grid, Overlay } from "@mantine/core"
+import { Flex, Title, Grid, Overlay, Text } from "@mantine/core"
 import { auth, db } from "../../firebase"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import { doc, setDoc, getDoc } from "firebase/firestore"
+import { AuthContext } from "../_app"
 import Navbar from "../../components/Navbar";
 import UserProgress from "../../components/dashboard/UserProgress";
 import TrendingProblems from "../../components/dashboard/TrendingProblems";
 import LeaderboardSpot from "../../components/LeaderboardSpot";
 import UserBadges from "../../components/dashboard/UserBadges";
 import OnboardingModals from "../../components/Onboarding"
+import { getProblemsWithSolutionCounts } from "../../queries"
+import Head from "next/head"
 
 
 export default function DashboardPage() {
     let router = useRouter();
-    let [user, setUser] = useState(null);
     let [needOnboard, setNeedOnboard] = useState(false);
+    let [userInfo, setUserInfo] = useState(null);
+    let [sortedProblems, setSortedProblems] = useState([]);
 
     let theme = {
         background: '#16171b',
@@ -25,32 +29,26 @@ export default function DashboardPage() {
         accentColor: '#629C44',
     }
 
+    // Route guarding useEffect
+    const { user, loading } = useContext(AuthContext);
     useEffect(() => {
-        let getUser = async () => {
-            let userData = auth.currentUser;
-            console.log("Current user: ");
-            console.log(userData);
-
-            if (userData == null) {
-                console.log("No user logged in");
-                router.push("/login")
-                return;
-            }
-
-            setUser(userData);
+        if (!loading && !user) {
+            router.push('/login');
         }
+        let uid = auth.currentUser?.uid || null;
 
-        getUser();
-
-        const userRef = doc(db, "USERS", auth.currentUser.uid);
-        getDoc(userRef).then((doc) => {
-            let info = doc.data();
-            ("favoriteLanguages" in info) ? setNeedOnboard(false) : setNeedOnboard(true);
-        })
-    }, [])
+        if (uid) {
+            const userRef = doc(db, "USERS", uid);
+            getDoc(userRef).then((doc) => {
+                let info = doc.data();
+                setUserInfo(info);
+                ("favoriteLanguages" in info) ? setNeedOnboard(false) : setNeedOnboard(true);
+            })
+        }
+    }, [user, loading])
 
     let finishOnboarding = (username, skills, favoriteLanguages) => {
-        let userRef = doc(db, "USERS", auth.currentUser.uid);
+        let userRef = doc(db, "USERS", uid);
         setDoc(userRef, {
             username,
             skills,
@@ -61,20 +59,23 @@ export default function DashboardPage() {
     }
 
     return <>
-
+        <Head>
+            <title>User Dashboard</title>
+        </Head>
         {needOnboard ? <>
             <Overlay blur={2} color="#000" opacity={0.5} />
             <OnboardingModals onComplete={finishOnboarding} />
         </> : null}
 
         <Navbar />
+
         <Flex direction="column" align="center" w="100vw" h="90vh " style={{ backgroundColor: theme.background }} pt={15}>
-            <Title order={1} mb={20} c={theme.primaryTextColor}>Welcome back{user ? `, ${user.displayName}!` : "!"}</Title>
+            <Title order={1} mb={20} c={theme.primaryTextColor}>Welcome back{userInfo ? `, ${userInfo.displayName}!` : "!"}</Title>
             <Grid columns={2} gap={20}>
                 <Grid.Col span={1}>
-                    <UserProgress />
-                    <LeaderboardSpot />
-                    <UserBadges />
+                    {/* <UserProgress user={auth.currentUser.uid || null} /> */}
+                    <LeaderboardSpot uid={auth.currentUser?.uid} />
+                    <UserBadges uid={auth.currentUser?.uid} />
                 </Grid.Col>
                 <Grid.Col span={1}>
                     <TrendingProblems />

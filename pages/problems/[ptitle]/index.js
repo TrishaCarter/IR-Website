@@ -6,10 +6,12 @@ import {
 import { RemoveScroll } from "react-remove-scroll";
 import { useRouter } from "next/router";
 import Navbar from "../../../components/Navbar";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { auth, getProblemBySlug, trackSolution, updateUserScore } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
 import { notifications } from '@mantine/notifications';
+import { AuthContext } from '../../_app';
+import Head from 'next/head';
 
 export default function ProblemPage() {
     let router = useRouter();
@@ -32,78 +34,6 @@ export default function ProblemPage() {
         // Ensure the score isn't negative:
         return Math.max(cpuPoints + gpuPoints, 0);
     }
-
-    // const runTestCases = async () => {
-
-    //     const testPromises = prob.examples.map((example, index) => {
-    //         // Build a structured test case array where each input contains name, type, and value
-    //         const structuredInputs = example.inputs.map(inp => {
-    //             return {
-    //                 name: inp.name,
-    //                 type: inp.type || "int",
-    //                 // If inp.value is a string starting with "[" assume it's an array in string form,
-    //                 // and try to parse it, otherwise leave it as is
-    //                 value: typeof inp.value === "string" && inp.value.trim().startsWith("[")
-    //                     ? JSON.parse(inp.value)
-    //                     : inp.value
-    //             };
-    //         });
-
-    //         const testPayload = {
-    //             code: code,
-    //             functionName: prob.functionName,
-    //             resultType: prob.resultType,
-    //             testCase: structuredInputs,
-    //             output: example.output
-    //         };
-
-    //         return fetch("http://localhost:1739/run_test", {
-    //             method: "POST",
-    //             headers: {
-    //                 "Content-Type": "application/json",
-    //             },
-    //             body: JSON.stringify(testPayload),
-    //         })
-    //             .then(response => response.json())
-    //             .then(data => {
-    //                 console.log(`Test case ${index + 1} response:`, data);
-
-    //                 if (data.passed === true) {
-    //                     notifications.show({
-    //                         title: `Test Case ${index + 1} passed`,
-    //                         message: "Test passed",
-    //                         color: "green",
-    //                         autoClose: 1000,
-    //                     });
-    //                     return true;
-    //                 } else {
-    //                     notifications.show({
-    //                         title: `Test Case ${index + 1} failed`,
-    //                         message: "Your solution did not pass this test case",
-    //                         color: "red",
-    //                         autoClose: 2000,
-    //                     });
-    //                     return false;
-    //                 }
-    //             })
-    //             .catch((error) => {
-    //                 notifications.show({
-    //                     title: `Test Case ${index + 1} error`,
-    //                     message: "Error executing test case",
-    //                     color: "red",
-    //                     autoClose: 2000,
-    //                 });
-    //                 return false;
-    //             });
-    //     });
-
-    //     // Wait for all test case promises to complete
-    //     const testResults = await Promise.all(testPromises);
-    //     console.log("Test results:", testResults);
-
-    //     // If every test returned true then all passed
-    //     return testResults.every(result => result === true);
-    // };
 
     const runTestCases = async () => {
         let combinedCode = null;
@@ -131,7 +61,9 @@ export default function ProblemPage() {
                 }
             };
 
-            return fetch("http://localhost:1739/run_test", {
+            console.log("Sending a fetch...");
+
+            return fetch(`http://${process.env.NEXT_PUBLIC_VALIDATION_URL}/run_test`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -167,8 +99,10 @@ export default function ProblemPage() {
                         color: "red",
                         autoClose: 2000,
                     });
+                    console.error("Error in test case:", error);
                     return false;
                 });
+
         });
 
         // Wait for all test case promises to complete
@@ -181,6 +115,19 @@ export default function ProblemPage() {
     };
 
     const checkSolution = async () => {
+
+        // Check with regex for includes, and stop process if found
+        let reg = /.*#\s*include.*/gm;
+        if (reg.test(code)) {
+            notifications.show({
+                title: "Submission halted",
+                message: "Your code contains 'include' statements.",
+                color: "red",
+                autoClose: 2000,
+            });
+            return; // Stop further processing
+        }
+
         // Run test cases; only proceed if all pass.
         const results = await runTestCases();
         console.log("All test cases ran");
@@ -208,7 +155,7 @@ export default function ProblemPage() {
         console.log(results.code);
 
 
-        fetch("http://localhost:1738/check", {
+        fetch(`http://${process.env.NEXT_PUBLIC_COMPILER_URL}/check`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -268,6 +215,13 @@ export default function ProblemPage() {
         })
     }, [])
 
+    const { user, loading } = useContext(AuthContext);
+    useEffect(() => {
+        if (!loading && !user) {
+            router.push('/login');
+        }
+    }, [user, loading])
+
     let theme = {
         background: "#16171b",
         secondaryBackground: "#262729",
@@ -278,6 +232,9 @@ export default function ProblemPage() {
 
     return (
         <RemoveScroll>
+            <Head>
+                <title>{prob.title} - Refactr</title>
+            </Head>
             <Navbar />
             <Flex
                 w={"100vw"}

@@ -1,32 +1,51 @@
-import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar } from "@mantine/core"
+import { Flex, Group, Anchor, Space, Text, Button, Menu, Avatar, Box, Divider, Badge } from "@mantine/core"
 import { useEffect, useState } from "react";
-import { auth } from "../firebase";
+import { auth, getUserDoc } from "../firebase";
+import { checkAllBadges } from "../badgeHelpers";
 import { useRouter } from "next/router";
 
 export default function Navbar() {
     let router = useRouter();
     let [user, setUser] = useState(null);
     let [avatar, setAvatar] = useState('');
-
-    // useEffect(() => {
-    //     let getUser = async () => {
-    //         let userData = await auth.currentUser;
-
-    //         if (userData == null) {
-    //             console.log("No user logged in");
-    //             router.push("/login")
-    //             return;
-    //         }
-    //         console.log(userData);
-    //         setUser(userData);
-    //     }
-
-    //     getUser();
-    // }, [])
+    let [userInfo, setUserInfo] = useState(null);
 
     useEffect(() => {
-        setAvatar(user?.photoURL || '');
-    }, [user]);
+        let getUser = async () => {
+            let userData = await auth.currentUser;
+            let userDoc;
+            try {
+                userDoc = await getUserDoc(userData.uid);
+            } catch (error) {
+                console.log("Error fetching user document:", error);
+            }
+
+            if (userData == null) {
+                console.log("No user logged in");
+                router.push("/login")
+                return;
+            }
+
+            setUser(auth.currentUser || null);
+            setUserInfo(userDoc);
+            setAvatar(userDoc?.photoURL || null);
+        }
+
+        getUser();
+    }, [])
+
+    // Check for badge unlocks on basically every page load
+    useEffect(() => {
+        if (user) {
+            let uid = user.uid;
+            checkAllBadges(uid).then(() => {
+                console.log("Checked all badges for user:", uid);
+            }
+            ).catch((error) => {
+                console.error("Error checking badges:", error);
+            });
+        }
+    })
 
     let theme = {
         background: '#16171b',
@@ -34,6 +53,13 @@ export default function Navbar() {
         primaryTextColor: '#c9c9c9',
         secondaryTextColor: '#aaaaaa',
         accentColor: '#629C44',
+    }
+
+    let dropdownBoxStyle = {
+        background: theme.secondaryBackground,
+        color: theme.primaryTextColor,
+        padding: '10px',
+        borderRadius: '5px',
     }
 
     let handleLogout = async () => {
@@ -49,32 +75,43 @@ export default function Navbar() {
     return (
         <Flex justify={"space-between"} align={"center"} w={"100%"} p={"lg"} h={"10vh"} style={{ background: theme.secondaryBackground }}>
             <Group>
-                <Text c={theme.primaryTextColor}>Logo</Text>
+                <Text
+                    c={theme.primaryTextColor}
+                    onClick={() => router.push("/dashboard")}
+                >Logo</Text>
                 <Space w={"lg"} />
                 <Anchor href={"/dashboard"} style={{ color: theme.accentColor }}>Dashboard</Anchor>
                 <Anchor href={"/problems"} style={{ color: theme.accentColor }}>Problems</Anchor>
             </Group>
-            <Menu
-                transitionProps={{ transition: 'pop-top-right' }}
-                position="top-end"
-                width={220}
-                withinPortal
-            >
-                <Menu.Target>
-                    <Avatar src={avatar} size={30} m={0} />
-                </Menu.Target>
-                <Menu.Dropdown>
-                    <Menu.Item>
-                        <Anchor href={"/profile"} c={theme.accentColor}>Profile</Anchor>
-                    </Menu.Item>
-                    <Menu.Item>
-                        <Anchor href={"/account-settings"} c={theme.accentColor}>Settings</Anchor>
-                    </Menu.Item>
-                    <Menu.Item onClick={handleLogout} variant="light" c={"red"}>
-                        Log Out
-                    </Menu.Item>
-                </Menu.Dropdown>
-            </Menu>
+
+            <Group>
+                <Badge color={theme.accentColor} variant="light">{userInfo?.currency || 0}¢</Badge>
+                <Menu
+                    transitionProps={{ transition: 'pop-top-right' }}
+                    position="top-end"
+                    width={220}
+                    withinPortal={false}
+
+                >
+                    <Menu.Target>
+                        <Avatar src={avatar} size={30} m={0} />
+                    </Menu.Target>
+                    <Menu.Dropdown w={130} bg={theme.secondaryBackground} style={{ borderRadius: '10px' }} bd={`1px solid ${theme.secondaryTextColor}`}>
+                        <Box style={dropdownBoxStyle} onClick={() => router.push("/profile")}>
+                            <Text c={theme.accentColor}>Profile</Text>
+                        </Box>
+                        <Divider />
+                        <Box style={dropdownBoxStyle}>
+
+                            <Anchor href={"/settings"} c={theme.accentColor}>Settings</Anchor>
+                        </Box>
+                        <Divider />
+                        <Box style={dropdownBoxStyle}>
+                            <Anchor onClick={handleLogout} variant="light" c={"red"}>Log Out</Anchor>
+                        </Box>
+                    </Menu.Dropdown>
+                </Menu>
+            </Group>
         </Flex>
     )
 }

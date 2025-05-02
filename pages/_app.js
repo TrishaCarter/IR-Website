@@ -5,7 +5,7 @@ import Head from 'next/head';
 import { MantineProvider } from '@mantine/core';
 import { useState, useEffect, createContext, useContext } from "react";
 import { auth } from "@/firebase"; // Import auth from your Firebase setup
-import { onAuthStateChanged } from "firebase/auth";
+import { browserSessionPersistence, onAuthStateChanged, setPersistence } from "firebase/auth";
 import { Notifications } from '@mantine/notifications';
 
 
@@ -37,20 +37,29 @@ export default function App({ Component, pageProps }) {
 }
 
 // Create Auth Context
-const AuthContext = createContext();
-
+export const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Listen for user authentication state changes
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            setLoading(false);
-        });
+        const initializeAuth = async () => { // Create an async function
+            try {
+                await setPersistence(auth, browserSessionPersistence); // Set persistence
+                // Listen for user authentication state changes
+                const unsubscribe = onAuthStateChanged(auth, (user) => {
+                    setUser(user || null);
+                    setLoading(false);
+                });
 
-        return () => unsubscribe(); // Cleanup subscription
+                return () => unsubscribe(); // Cleanup subscription
+            } catch (error) {
+                console.error("Firebase Auth Persistence Error:", error);
+                setLoading(false); // Ensure loading is set to false even on error
+            }
+        };
+
+        initializeAuth();
     }, []);
 
     return (

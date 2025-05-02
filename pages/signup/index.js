@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Divider, Box, Text, Center, Stack, Title } from '@mantine/core';
+import { TextInput, PasswordInput, Button, Checkbox, Group, Anchor, Divider, Box, Text, Center, Stack, Title, RemoveScroll } from '@mantine/core';
 import { IconMail, IconLock, IconBrandGoogle } from '@tabler/icons-react';
-import { createUserWithEmailAndPassword, setPersistence, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, setPersistence, browserSessionPersistence, signInWithPopup } from 'firebase/auth';
 import { getDoc, setDoc, doc } from 'firebase/firestore';
 import { loginUser } from '@/handlers';
 import { auth, googleProvider, db } from '../../firebase';
 import { useRouter } from 'next/router';
+import { notifications } from '@mantine/notifications';
+import Head from 'next/head';
 
 export default function SignInPage() {
     const router = useRouter();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    // State used for success or failure message on signup
-    const [signupText, setSignupText] = useState('');
 
     let theme = {
         background: '#16171b',
@@ -45,23 +45,34 @@ export default function SignInPage() {
     }
 
     let signUpEmailPass = async () => {
+        await setPersistence(auth, browserSessionPersistence);
         await createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
                 setSignupText('Account created successfully. Redirecting to login page...');
+                notifications.show({ // Show success notification
+                    title: 'Account Created!',
+                    message: 'Account created successfully. Redirecting to dashboard...',
+                    color: 'green',
+                });
                 router.push('/login');
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 console.log(errorCode, errorMessage);
+                notifications.show({ // Show success notification
+                    title: 'Error creating account',
+                    message: 'Please try again.',
+                    color: 'red',
+                });
             });
     }
 
     let signupGoogle = async () => {
         try {
-            await setPersistence(auth, 'session');
+            await setPersistence(auth, browserSessionPersistence);
             let gAuth = await signInWithPopup(auth, googleProvider);
             let uid = gAuth.user.uid;
 
@@ -69,6 +80,11 @@ export default function SignInPage() {
             if (userDoc) {
                 console.log('User data found:', userDoc);
                 setLoginMessage('Logged in successfully. Redirecting to dashboard...');
+                notifications.show({ // Show success notification
+                    title: 'Google Login Successful',
+                    message: 'Logged in successfully. Redirecting to dashboard...',
+                    color: 'green',
+                });
                 loginUser(uid).then(() => {
                     router.push('/dashboard');
                 }).catch((error) => {
@@ -85,6 +101,11 @@ export default function SignInPage() {
             try {
                 createUserDoc(uid, userData);
                 console.log("User data created successfully.");
+                notifications.show({ // Show success notification
+                    title: 'Google Login Successful',
+                    message: 'Logged in successfully. Redirecting to dashboard...',
+                    color: 'green',
+                });
                 router.push('/dashboard');
             } catch (error) {
                 console.error('Error creating user data:', error);
@@ -93,11 +114,20 @@ export default function SignInPage() {
         } catch (error) {
             console.log("Error with Google Sign In Popup:")
             console.error(error);
+            notifications.show({ // Show success notification
+                title: 'Error with Google Sign In',
+                message: 'Please try again.',
+                color: 'red',
+            });
+
         }
     }
 
-    return (
-        <Center style={{ minHeight: '100vh', backgroundColor: theme.background }}>
+    return <RemoveScroll>
+        <Head>
+            <title>Sign Up - Refactr</title>
+        </Head>
+        <Center style={{ minHeight: '100vh', minWidth: '100vw', backgroundColor: theme.background }}>
             <Box sx={{ minWidth: 400, width: '100%', padding: 24, borderRadius: 8 }}>
                 {/* <Title order={1}>IR Website (Name tbd)</Title> */}
                 {/* Header */}
@@ -108,21 +138,22 @@ export default function SignInPage() {
 
                 {/* Google Sign In */}
                 <Button
-                    fullWidth
-                    variant="outline"
-                    leftIcon={<IconBrandGoogle size={18} />}
-                    color="gray"
+                    miw={"100%"}
+                    // bg={theme.accentColor}
+                    c={theme.accentColor}
+                    variant='outline'
+                    // leftIcon={<IconBrandGoogle size={18} />}
                     mt="md"
                     radius="md"
-                    style={{ borderColor: theme.accentColor, color: theme.accentColor, minWidth: '300px', width: "25vw" }}
+                    style={{ borderColor: theme.accentColor, color: theme.accentColor }}
                     onClick={signupGoogle}
                 >
                     Sign in with Google
                 </Button>
 
                 {/* Divider */}
-                <Stack position="apart" align='center' mt="md">
-                    <Divider size="sm" label="Or" labelPosition="center" style={{ width: '45%' }} />
+                <Stack position="apart" align='center' mt={"xl"} mb={"lg"} >
+                    <Divider size="sm" label="OR" labelPosition="center" style={{ width: '75%' }} />
                 </Stack>
 
                 {/* Email Input */}
@@ -173,12 +204,7 @@ export default function SignInPage() {
                     </Anchor>
                 </Text>
 
-                <br />
-
-                <Text align="center" size="sm" style={{ color: theme.primaryTextColor }}>
-                    {signupText}
-                </Text>
             </Box>
         </Center >
-    );
+    </RemoveScroll>;
 }

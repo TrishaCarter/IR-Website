@@ -1,9 +1,11 @@
 import { Title, Text, Container, Flex, TextInput, Grid, Card, Stack, Group, Button } from "@mantine/core"
 import { getAllProblems } from "@/firebase"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
+import { AuthContext } from "../_app"
 import Link from "next/link"
 import Navbar from "../../components/Navbar";
 import { auth, getUserSolutions } from "../../firebase";
+import Head from "next/head"
 
 export default function ProblemHomepage() {
     const [problems, setProblems] = useState([]);
@@ -20,11 +22,14 @@ export default function ProblemHomepage() {
         secondaryTextColor: '#aaaaaa',
         accentColor: '#629C44',
     }
-
+    const { user, loading } = useContext(AuthContext);
     useEffect(() => {
-        const userId = auth.currentUser.uid;
+        if (!loading && !user) {
+            router.push('/login');
+        }
         // Wait for both promises to resolve before trying to filter. 
         // A problem came up where both states were not updating in a proper time to filter correctly.
+        const userId = auth.currentUser.uid;
         Promise.all([getAllProblems(), getUserSolutions(userId)])
             .then(([allProblems, userSolutions]) => {
                 setProblems(allProblems);
@@ -54,7 +59,7 @@ export default function ProblemHomepage() {
                 console.log("Finished", finishedArr);
             })
             .catch(err => console.error(err));
-    }, []);
+    }, [user, loading]);
 
 
     // Filter each group by the search term
@@ -114,47 +119,52 @@ export default function ProblemHomepage() {
         </Grid>
     );
 
-    return <Flex w={"100vw"} minh={"100vh"} m={0} direction={"column"} align={"center"}
-        style={{ backgroundColor: theme.background, color: theme.primaryTextColor }}
-    >
-        <Navbar />
+    return <>
+        <Head>
+            <title>All Problems - Refactr</title>
+        </Head>
+        <Flex w={"100vw"} minh={"100vh"} m={0} direction={"column"} align={"center"}
+            style={{ backgroundColor: theme.background, color: theme.primaryTextColor }}
+        >
+            <Navbar />
 
-        <Container size="xl" py="xl" mih={"90vh"}>
-            <Title order={2} mb="md" ta={"center"}>
-                All Problems
-            </Title>
+            <Container size="xl" py="xl" mih={"90vh"}>
+                <Title order={2} mb="md" ta={"center"}>
+                    All Problems
+                </Title>
 
-            <TextInput
-                placeholder="Search problems..."
-                value={search}
-                onChange={(e) => setSearch(e.currentTarget.value)}
-                mb="lg"
-            />
+                <TextInput
+                    placeholder="Search problems..."
+                    value={search}
+                    onChange={(e) => setSearch(e.currentTarget.value)}
+                    mb="lg"
+                />
 
-            {/* In-Progress Problems */}
-            {filteredInProgress.length > 0 && (
-                <>
-                    <Title order={3} mb="md" ta="center">In-Progress</Title>
-                    {renderGrid(filteredInProgress, "Continue")}
-                </>
-            )}
+                {/* In-Progress Problems */}
+                {filteredInProgress.length > 0 && (
+                    <>
+                        <Title order={3} mb="md" ta="center">In-Progress</Title>
+                        {renderGrid(filteredInProgress, "Continue")}
+                    </>
+                )}
 
-            {/* Unsolved Problems */}
-            {filteredUnsolved.length > 0 && (
-                <>
-                    <Title order={3} mb="md" ta="center" mt="xl">Unsolved</Title>
-                    {renderGrid(filteredUnsolved, "Solve")}
-                </>
-            )}
+                {/* Unsolved Problems */}
+                {filteredUnsolved.length > 0 && (
+                    <>
+                        <Title order={3} mb="md" ta="center" mt="xl">Unsolved</Title>
+                        {renderGrid(filteredUnsolved, "Solve")}
+                    </>
+                )}
 
-            {/* Finished Problems */}
-            {filteredFinished.length > 0 && (
-                <>
-                    <Title order={3} mb="md" ta="center" mt="xl">Finished</Title>
-                    {renderGrid(filteredFinished, "View")}
-                </>
-            )}
+                {/* Finished Problems */}
+                {filteredFinished.length > 0 && (
+                    <>
+                        <Title order={3} mb="md" ta="center" mt="xl">Finished</Title>
+                        {renderGrid(filteredFinished, "View")}
+                    </>
+                )}
 
-        </Container>
-    </Flex>
+            </Container>
+        </Flex>
+    </>
 }

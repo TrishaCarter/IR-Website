@@ -10,6 +10,7 @@ import {
     addDoc, query, where,
     updateDoc, increment
 } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -54,8 +55,34 @@ export let getUserDoc = async (uid) => {
     }
 }
 
+// For putting image in Firebase Storage
+export const uploadProfilePic = async (file, uid) => {
+    if (!file || !file.name) throw new Error("Invalid file input");
+
+    const storage = getStorage();
+    const profilePicRef = ref(storage, `profile_pictures/${uid}`);
+
+    await uploadBytes(profilePicRef, file);
+    return getDownloadURL(profilePicRef);
+};
+
+// For putting ^^ image in Firestore 
+export const updateUserProfilePic = async (uid, url) => {
+    const userRef = doc(db, 'USERS', uid);
+    await setDoc(userRef, { photoURL: url }, { merge: true });
+};
+
+export const updateUsername = async (uid, username) => {
+    const userRef = doc(db, 'USERS', uid);
+    await setDoc(userRef, { displayName: username }, { merge: true });
+};
+
+export const updateUserEmail = async (uid, email) => {
+    const userRef = doc(db, 'USERS', uid);
+    await setDoc(userRef, { email: email }, { merge: true });
+};
+
 export let getAllProblems = async () => {
-    let problems = [];
     let problemsRef = collection(db, 'PROBLEMS');
     try {
         const querySnapshot = await getDocs(problemsRef);
@@ -87,6 +114,18 @@ export let createProblem = async (data) => {
 
     } catch (error) {
         console.error('Error creating problem: ', error);
+    }
+}
+
+export let getAllSolutions = async () => {
+    let solutionsRef = collection(db, 'SOLUTIONS');
+    try {
+        const querySnapshot = await getDocs(solutionsRef);
+        const data = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        return data;
+    } catch (error) {
+        console.error("Error fetching documents: ", error);
+        return [];
     }
 }
 
@@ -153,6 +192,10 @@ export let getProblemSolutions = async (problemId) => {
 }
 
 export let getUserById = async (uid) => {
+    if (!uid) {
+        console.log("No UID provided");
+        return null;
+    }
     let docRef = doc(db, 'USERS', uid);
     let docSnap = await getDoc(docRef);
 
