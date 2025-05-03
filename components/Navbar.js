@@ -79,13 +79,13 @@ export default function Navbar() {
                     src={"/IR-logo.png"}
                     alt="Logo"
                     style={{
-                        width: "90px",
-                        height: "80px",
+                        width: "40px",
+                        height: "40px",
                         cursor: "pointer",
                     }}
                     onClick={() => router.push("/")}
                 />
-                <Space w={"lg"} />
+                {/* <Space w={"sm"} /> */}
                 <Anchor href={"/dashboard"} style={{ color: theme.accentColor }}>Dashboard</Anchor>
                 <Anchor href={"/problems"} style={{ color: theme.accentColor }}>Problems</Anchor>
             </Group>
