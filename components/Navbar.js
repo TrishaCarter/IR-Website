@@ -85,7 +85,7 @@ export default function Navbar() {
                     }}
                     onClick={() => router.push("/")}
                 />
-                <Space w={"lg"} />
+                {/* <Space w={"sm"} /> */}
                 <Anchor href={"/dashboard"} style={{ color: theme.accentColor }}>Dashboard</Anchor>
                 <Anchor href={"/problems"} style={{ color: theme.accentColor }}>Problems</Anchor>
             </Group>

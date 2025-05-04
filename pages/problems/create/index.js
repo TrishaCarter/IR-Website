@@ -18,6 +18,7 @@ import Navbar from '../../../components/Navbar';
 import { createProblem } from '../../../firebase';
 import { Editor } from "@monaco-editor/react";
 import Head from 'next/head';
+import { notifications } from '@mantine/notifications';
 
 export default function CreateProblem() {
     // Basic problem info
@@ -147,6 +148,11 @@ export default function CreateProblem() {
             setArgsErr(false);
             setExamplesErr(false);
             setDefaultCodeErr(false);
+            notifications.show({
+                title: 'Success',
+                message: 'Problem created successfully!',
+                color: 'green',
+            })
         } catch (error) {
             console.error('Error creating problem: ', error);
         }

@@ -7,7 +7,7 @@ import { RemoveScroll } from "react-remove-scroll";
 import { useRouter } from "next/router";
 import Navbar from "../../../components/Navbar";
 import { useCallback, useContext, useEffect, useState } from "react";
-import { auth, getProblemBySlug, trackSolution, updateUserScore } from "../../../firebase";
+import { auth, getProblemBySlug, getProblemSolutions, trackSolution, updateUserScore } from "../../../firebase";
 import { Editor } from "@monaco-editor/react";
 import { notifications } from '@mantine/notifications';
 import { AuthContext } from '../../_app';
@@ -25,15 +25,27 @@ export default function ProblemPage() {
         setCode(value);
     }, []);
 
-    const MAX_METRIC = 100;
+    let calculateScore = async (userPerf) => {
+        let probSols = await getProblemSolutions(prob.id);
+        console.log(probSols);
 
-    function calculateScore(cpu_metric, gpu_metric) {
-        // The lower the metric, the higher the score.
-        const cpuPoints = MAX_METRIC - cpu_metric;
-        const gpuPoints = MAX_METRIC - gpu_metric;
-        // Ensure the score isn't negative:
-        return Math.max(cpuPoints + gpuPoints, 0);
-    }
+        let solMetrics = probSols.map(s => Number(s.cpu_metric));
+        console.log(solMetrics);
+
+        const bestPerf = Math.min(...solMetrics);
+
+
+        if (userPerf <= 0 || bestPerf <= 0) return 5;
+
+        const ratio = bestPerf / userPerf;
+        const score = Math.min(100, Math.pow(ratio, 0.8) * 100);
+        console.log("Best performance:", bestPerf);
+        console.log("User performance:", userPerf);
+        console.log("Score:", Math.round(score));
+
+        return Math.round(score);
+    };
+
 
     const runTestCases = async () => {
         let combinedCode = null;
@@ -66,7 +78,8 @@ export default function ProblemPage() {
 
             console.log("Sending a fetch...");
 
-            return fetch(`http://${process.env.NEXT_PUBLIC_VALIDATION_URL}/run_test`, {
+            return fetch(`https://proxy-service-205616280235.us-central1.run.app/run_test`, {
+            //return fetch(`http://localhost:443/run_test`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -157,7 +170,8 @@ export default function ProblemPage() {
         console.log(results.code);
 
 
-        fetch(`http://${process.env.NEXT_PUBLIC_COMPILER_URL}/check`, {
+        fetch(`https://proxy-service-205616280235.us-central1.run.app/check`, {
+        //fetch(`http://localhost:443/check`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -183,29 +197,28 @@ export default function ProblemPage() {
             .then(data => {
                 // if (data === undefined) return;
                 console.log("Response data:", data);
-                let cpu_metric = Math.floor(Math.random() * 100);
-                let gpu_metric = Math.floor(Math.random() * 100);
+                let userPerf = JSON.parse(data).output;
 
-                let score = calculateScore(cpu_metric, gpu_metric);
-                console.log("Score:", score);
+                calculateScore(userPerf).then((score) => {
+                    console.log("Score:", score);
 
-                trackSolution(uid, prob.id, {
-                    code: code,
-                    finished: true,
-                    probid: prob.id,
-                    uid: uid,
-                    score: score,
-                    cpu_metric: cpu_metric,
-                    gpu_metric: gpu_metric,
-                })
-                    .then(() => {
-                        notifications.show({
-                            title: "Code compiled successfully!",
-                            message: `Score: ${score}`,
-                            color: "green",
-                            autoClose: 10000,
+                    trackSolution(uid, prob.id, {
+                        code: code,
+                        finished: true,
+                        probid: prob.id,
+                        uid: uid,
+                        score: score,
+                        cpu_metric: userPerf
+                    })
+                        .then(() => {
+                            notifications.show({
+                                title: "Code compiled successfully!",
+                                message: `Score: ${score}`,
+                                color: "green",
+                                autoClose: 10000,
+                            });
                         });
-                    });
+                });
             });
     };
 

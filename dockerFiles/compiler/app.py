@@ -47,7 +47,7 @@ def check():
             )
         else:
             proc = subprocess.Popen(
-                ["python3", "c_preprocess.py", "testing.c", numArgs, functionName, '{"#1": "$1"}', "c.rbe", str(probID)],
+                ["python3", "c_preprocess.py", "testing.c", str(numArgs), functionName, '{"#1": "$1"}', "c.rbe", str(probID)],
                 cwd=repo_path,
                 universal_newlines=True,
                 stdout=subprocess.PIPE,
