@@ -126,7 +126,7 @@ export default function AccountSettings() {
                     <Center style={{ marginBottom: '30px', flexDirection: 'column' }}>
                         <Avatar src={preview} alt="Profile Picture" size={150} mb="md" />
                         <FileButton onChange={(e) => handleImageUpload(e)} accept='image/png,image/jpeg'>
-                            {(props) => <Button {...props} >Upload image</Button>}
+                            {(props) => <Button {...props} bg={theme.accentColor}>Upload image</Button>}
                         </FileButton>
                     </Center>
                     <TextInput label="Username" value={username}
@@ -143,7 +143,7 @@ export default function AccountSettings() {
                     } mb="sm" size="md" />
                     <PasswordInput label="New Password" value={password} onChange={(e) => setPassword(e.target.value)} mb="lg" size="md" />
                     <Group position="apart" mt="xl" >
-                        <Button onClick={handleUpdateProfile} size="xl" > Save Changes </Button>
+                        <Button onClick={handleUpdateProfile} size="xl" bg={theme.accentColor}> Save Changes </Button>
                         < Button color="red" onClick={handleUpdatePassword} size="xl" > Update Password </Button>
                     </Group>
                 </Box>
