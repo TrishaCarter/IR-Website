@@ -40,7 +40,7 @@ export default function LeaderboardSpot({ uid }) {
             <Title order={3} c={theme.accentColor}> Global Leaderboard</ Title>
             <Title order={4} size="sm" c={theme.primaryTextColor}>Your rank: <b>#{rank + 1}</b> out of {userCount}</Title>
 
-            <Progress value={(1 - (rank + 1) / userCount) * 100} size="sm" color="blue" mt="md" />
+            <Progress value={(1 - (rank + 1) / userCount) * 100} size="sm" color={theme.accentColor} mt="md" />
         </Card >
     );
 }

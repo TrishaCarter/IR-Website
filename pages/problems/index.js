@@ -106,7 +106,7 @@ export default function ProblemHomepage() {
                                 component={Link}
                                 href={`/problems/${slugify(problem.title)}`}
                                 variant="light"
-                                color="blue"
+                                color={theme.accentColor}
                                 fullWidth
                                 mt="md"
                             >

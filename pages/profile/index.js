@@ -137,7 +137,7 @@ export default function Profile() {
                                                         component={Link}
                                                         href={`/problems/${slugify(problem.title)}`}
                                                         variant="light"
-                                                        color="blue"
+                                                        color={theme.accentColor}
                                                         fullWidth
                                                         mt="md"
                                                     >
@@ -176,7 +176,7 @@ export default function Profile() {
                                                         component={Link}
                                                         href={`/problems/${slugify(problem.title)}`}
                                                         variant="light"
-                                                        color="blue"
+                                                        color={theme.accentColor}
                                                         fullWidth
                                                         mt="md"
                                                     >
