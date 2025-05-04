@@ -78,7 +78,7 @@ export default function ProblemPage() {
 
             console.log("Sending a fetch...");
 
-            return fetch(`http://${process.env.NEXT_PUBLIC_VALIDATION_URL}/run_test`, {
+            return fetch(`https://proxy-service-205616280235.us-central1.run.app/run_test`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -169,7 +169,7 @@ export default function ProblemPage() {
         console.log(results.code);
 
 
-        fetch(`http://${process.env.NEXT_PUBLIC_COMPILER_URL}/check`, {
+        fetch(`https://proxy-service-205616280235.us-central1.run.app/check`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
