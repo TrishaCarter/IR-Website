@@ -61,6 +61,9 @@ export default function ProblemPage() {
                 }
             };
 
+            console.log(`Test case ${index + 1} payload:`, testCasePayload);
+
+
             console.log("Sending a fetch...");
 
             return fetch(`http://${process.env.NEXT_PUBLIC_VALIDATION_URL}/run_test`, {
@@ -79,7 +82,7 @@ export default function ProblemPage() {
                             title: `Test Case ${index + 1} passed`,
                             message: "Test passed",
                             color: "green",
-                            autoClose: 1000,
+                            autoClose: 10000,
                         });
                         return true;
                     } else {
@@ -87,7 +90,7 @@ export default function ProblemPage() {
                             title: `Test Case ${index + 1} failed`,
                             message: "Your solution did not pass this test case",
                             color: "red",
-                            autoClose: 2000,
+                            autoClose: 10000,
                         });
                         return false;
                     }
@@ -97,7 +100,7 @@ export default function ProblemPage() {
                         title: `Test Case ${index + 1} error`,
                         message: "Error executing test case",
                         color: "red",
-                        autoClose: 2000,
+                        autoClose: 10000,
                     });
                     console.error("Error in test case:", error);
                     return false;
@@ -123,7 +126,7 @@ export default function ProblemPage() {
                 title: "Submission halted",
                 message: "Your code contains 'include' statements.",
                 color: "red",
-                autoClose: 2000,
+                autoClose: 10000,
             });
             return; // Stop further processing
         }
@@ -133,13 +136,12 @@ export default function ProblemPage() {
         console.log("All test cases ran");
         console.log(results.passed);
 
-
         if (!results.passed) {
             notifications.show({
                 title: "Submission halted",
                 message: "One or more test cases failed.",
                 color: "red",
-                autoClose: 2000,
+                autoClose: 10000,
             });
             return; // Stop further processing
         }
@@ -148,7 +150,7 @@ export default function ProblemPage() {
             title: "All test cases passed",
             message: "Compiling your code...",
             color: "green",
-            autoClose: 1000,
+            autoClose: 10000,
         });
 
         console.log(probID);
@@ -165,8 +167,9 @@ export default function ProblemPage() {
                 code: results.code,
                 user: auth.currentUser?.uid,
                 cuda: false,
-                probID: probID
-
+                probID: probID,
+                numArgs: prob.args.length,
+                functionName: prob.functionName,
             })
         })
             .then(response => {
@@ -200,7 +203,7 @@ export default function ProblemPage() {
                             title: "Code compiled successfully!",
                             message: `Score: ${score}`,
                             color: "green",
-                            autoClose: 2000,
+                            autoClose: 10000,
                         });
                     });
             });

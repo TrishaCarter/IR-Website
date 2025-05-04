@@ -50,7 +50,6 @@ export default function SignInPage() {
             .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
-                setSignupText('Account created successfully. Redirecting to login page...');
                 notifications.show({ // Show success notification
                     title: 'Account Created!',
                     message: 'Account created successfully. Redirecting to dashboard...',
@@ -79,7 +78,6 @@ export default function SignInPage() {
             let userDoc = await getUserDoc(uid);
             if (userDoc) {
                 console.log('User data found:', userDoc);
-                setLoginMessage('Logged in successfully. Redirecting to dashboard...');
                 notifications.show({ // Show success notification
                     title: 'Google Login Successful',
                     message: 'Logged in successfully. Redirecting to dashboard...',

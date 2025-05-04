@@ -75,12 +75,16 @@ export default function Navbar() {
     return (
         <Flex justify={"space-between"} align={"center"} w={"100%"} p={"lg"} h={"10vh"} style={{ background: theme.secondaryBackground }}>
             <Group>
-            <img
-                src="/IR-logo.png"
-                alt="Logo"
-                style={{ height: 80, width: 100, cursor: 'pointer' }}
-                onClick={() => router.push("/")}
-            />
+                <img
+                    src={"/IR-logo-v2.png"}
+                    alt="Logo"
+                    style={{
+                        width: "80px",
+                        height: "50px",
+                        cursor: "pointer",
+                    }}
+                    onClick={() => router.push("/")}
+                />
                 <Space w={"lg"} />
                 <Anchor href={"/dashboard"} style={{ color: theme.accentColor }}>Dashboard</Anchor>
                 <Anchor href={"/problems"} style={{ color: theme.accentColor }}>Problems</Anchor>
