@@ -34,6 +34,9 @@ export default function ProblemPage() {
 
         const bestPerf = Math.min(...solMetrics);
 
+        if (solMetrics.length === 0) {
+            return 100;
+        }
 
         if (userPerf <= 0 || bestPerf <= 0) return 5;
 
@@ -79,7 +82,7 @@ export default function ProblemPage() {
             console.log("Sending a fetch...");
 
             return fetch(`https://proxy-service-205616280235.us-central1.run.app/run_test`, {
-            //return fetch(`http://localhost:443/run_test`, {
+                //return fetch(`http://localhost:443/run_test`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -171,7 +174,7 @@ export default function ProblemPage() {
 
 
         fetch(`https://proxy-service-205616280235.us-central1.run.app/check`, {
-        //fetch(`http://localhost:443/check`, {
+            //fetch(`http://localhost:443/check`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
