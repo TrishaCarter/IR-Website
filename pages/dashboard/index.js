@@ -45,7 +45,7 @@ export default function DashboardPage() {
                 ("favoriteLanguages" in info) ? setNeedOnboard(false) : setNeedOnboard(true);
             })
         }
-    }, [user, loading])
+    }, [user, loading, needOnboard])
 
     let finishOnboarding = (username, skills, favoriteLanguages) => {
         let userRef = doc(db, "USERS", auth.currentUser.uid);

@@ -38,9 +38,11 @@ export default function ProblemPage() {
             return 100;
         }
 
-        if (userPerf <= 0 || bestPerf <= 0) return 5;
+        if (userPerf <= 0 || bestPerf <= 0) return 0;
 
         const ratio = bestPerf / userPerf;
+        console.log('Ratio:', ratio);
+
         const score = Math.min(100, Math.pow(ratio, 0.8) * 100);
         console.log("Best performance:", bestPerf);
         console.log("User performance:", userPerf);

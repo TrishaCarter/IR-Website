@@ -46,7 +46,9 @@ export default function TrendingProblems() {
                         <Title order={4} style={{ color: "#fff" }}>{index + 1}.</Title>
                         <Card key={index} shadow="xs" px={"md"} style={{ backgroundColor: "#1e1e1e" }} w={"90%"}>
                             <Flex w={"100%"} h={"100%"} direction={"row"} justify="space-between" align="center">
-                                <Text size="sm" c={theme.primaryTextColor}>{problem.title}</Text>
+                                <Flex direction={"column"}>
+                                    <Text size="sm" c={theme.primaryTextColor}>{problem.title}</Text>
+                                </Flex>
                                 <Button px="5" w={"60px"} h={40} size="sm"
                                     bg={theme.accentColor}
                                     onClick={() => handleProbRedirect(problem.slugTitle)}
